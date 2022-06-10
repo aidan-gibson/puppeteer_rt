@@ -161,6 +161,7 @@ async function ticketFix(page : Page) : Promise<void> {
 
     if (emails.includes("malwarebytes.com")){virusMalware=true}
     else if(emails.includes("etrieve@reed.edu")){}//no tag, this is the "Notification of Staff Hire" emails
+    else if(ticketTitleValue.includes("Welcome to Reed College | Notes for your first day of work")){}//no tag https://help.reed.edu/Ticket/Display.html?id=347871
     else if(ticketTitleValue.includes("Welcome to Reed College")){}//no tag
     else if(emails.includes("msgappr@groups.reed.edu")||ticketTitleValue.includes("groups.reed.edu admins: Message Pending")){massEmail=true}
     else if(ticketTitleValue.includes("Shared Drive Request")){googleDrive=true}
@@ -178,6 +179,9 @@ async function ticketFix(page : Page) : Promise<void> {
     else if(ticketTitleValue.includes("Reed computing account")){reedAccounts=true}
     else if(ticketTitleValue.includes("Your Reed computing accounts are scheduled to be closed")){reedAccounts=true}
     else if(messages.includes("Please follow the steps below to setup your Reed account")){reedAccounts=true}
+    else if(ticketTitleValue.includes("Account Closure for Graduates")){reedAccounts=true}
+    else if(ticketTitleValue.includes("Account Tool")){reedAccounts=true}
+    else if(ticketTitleValue.includes("Computing at Reed")){reedAccounts=true}
 
 
 
@@ -191,7 +195,7 @@ async function ticketFix(page : Page) : Promise<void> {
 
         //maybe score it??? +1 point for each regex hit, -1 point for each NOhit? BUT there can b mult tags...tricky
 
-        //i means case insensitive BTW sometimes spaces/linebreaks dont go into messages string, so you have things like "Hello Eryn,We are" etc. make sure the regex is fine w that TODO actually just fucking fix this, it's nice to b able to use \b word boundaries
+        //i means case insensitive BTW sometimes spaces/linebreaks dont go into messages string, so you have things like "Hello Eryn,We are" etc. make sure the regex is fine w that TODO actually just fucking fix this, it's nice to b able to use \b word boundaries. also check https://help.reed.edu/Ticket/Display.html?id=346157, is the "show quoted text" content from the first message within messages variable?
         const googleDriveRegexList = [/google drive/i, /drive request/i]
         const NOgoogleDriveRegexList = []
         const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i]
@@ -212,9 +216,9 @@ async function ticketFix(page : Page) : Promise<void> {
         const NOphishRegexList = []
         const printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i]
         const NOprintingRegexList = []
-        const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i]
+        const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/]
         const NOreedAccountsRegexList = []
-        const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i]
+        const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i]
         const NOsoftwareRegexList = []
         const thesisRegexList = []
         const NOthesisRegexList = []

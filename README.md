@@ -1,3 +1,6 @@
+### Assumptions
+This will only go as far back at Aug '21 at most (ergo two-factor tags are potentially valid for every ticket etc)
+
 ### todo
 currently finding hard rules and looser regex, currently on reed accounts & access. pull up all tickets in both twatch and cus queue for that tag to understand it, also look at the criteria in the md file from the taylor writeup
   explicit rules AND regex stuff

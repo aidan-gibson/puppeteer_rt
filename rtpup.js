@@ -341,6 +341,7 @@ function ticketFix(page) {
                         virusMalware = true;
                     }
                     else if (emails.includes("etrieve@reed.edu")) { } //no tag, this is the "Notification of Staff Hire" emails
+                    else if (ticketTitleValue.includes("Welcome to Reed College | Notes for your first day of work")) { } //no tag https://help.reed.edu/Ticket/Display.html?id=347871
                     else if (ticketTitleValue.includes("Welcome to Reed College")) { } //no tag
                     else if (emails.includes("msgappr@groups.reed.edu") || ticketTitleValue.includes("groups.reed.edu admins: Message Pending")) {
                         massEmail = true;
@@ -392,6 +393,15 @@ function ticketFix(page) {
                     else if (messages.includes("Please follow the steps below to setup your Reed account")) {
                         reedAccounts = true;
                     }
+                    else if (ticketTitleValue.includes("Account Closure for Graduates")) {
+                        reedAccounts = true;
+                    }
+                    else if (ticketTitleValue.includes("Account Tool")) {
+                        reedAccounts = true;
+                    }
+                    else if (ticketTitleValue.includes("Computing at Reed")) {
+                        reedAccounts = true;
+                    }
                     else {
                         googleDriveRegexList = [/google drive/i, /drive request/i];
                         NOgoogleDriveRegexList = [];
@@ -416,9 +426,9 @@ function ticketFix(page) {
                         NOphishRegexList = [];
                         printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i];
                         NOprintingRegexList = [];
-                        reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i];
+                        reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/];
                         NOreedAccountsRegexList = [];
-                        softwareRegexList = [/1password/i, /one-password/i, /onepassword/i];
+                        softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i];
                         NOsoftwareRegexList = [];
                         thesisRegexList = [];
                         NOthesisRegexList = [];
