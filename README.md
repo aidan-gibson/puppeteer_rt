@@ -26,7 +26,9 @@ make chrome+firefox extension which is a guesser and only active when ur on help
 
 ask if i can work on testing rt5? rt5 search is mouthwatering. look thru all rt5 related tix to familiarize myself first
 
-config prettier
+config prettier, consistent pretty code, no semicolons etc. maybe also eslint+other formatting stuff from obsid proj
+
+move a lot of Puppeteer RT Tags.md to here for posterity etc
 
 ### Proj Setup
 * Put your kerberos password in password.txt and gitignore password.txt
