@@ -47,8 +47,7 @@ var fs_1 = require("fs");
 var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = "aigibson";
 var reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
-var month = "https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=Queue%20%3D%20%27cus%27%20AND%20Created%20%3C%20%272022-04-01%27%20AND%20Created%20%3E%20%272022-02-28%27&RowsPerPage=50&SavedChartSearchId=new&SavedSearchId=new"; //click on links which propagate, but swap Display with Modify in URL; ie from https://help.reed.edu/Ticket/Display.html?id=339418 to https://help.reed.edu/Ticket/Modify.html?id=339418
-var puppeteer = require('puppeteer'); //a
+var puppeteer = require('puppeteer');
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var browser, page;
@@ -68,7 +67,7 @@ function run() {
                     return [4 /*yield*/, page.setViewport({ width: 850, height: 800 })];
                 case 3:
                     _a.sent(); //doesn't matter
-                    return [4 /*yield*/, page.goto(reedLoginURL + "https://help.reed.edu/Ticket/Display.html?id=344331")];
+                    return [4 /*yield*/, page.goto(reedLoginURL + "https://help.reed.edu/Ticket/Display.html?id=346157")];
                 case 4:
                     _a.sent();
                     return [4 /*yield*/, page.type('[name="login"]', login)];
@@ -294,10 +293,10 @@ function ticketFix(page) {
                 case 48:
                     if (!(emailStanzas_1_1 = _e.sent(), !emailStanzas_1_1.done)) return [3 /*break*/, 51];
                     emailStanza = emailStanzas_1_1.value;
-                    return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, emailStanza)];
+                    return [4 /*yield*/, page.evaluate(function (el) { return el.innerText; }, emailStanza)];
                 case 49:
                     emailValue = _e.sent();
-                    messages += emailValue;
+                    messages += emailValue + "\n";
                     _e.label = 50;
                 case 50: return [3 /*break*/, 47];
                 case 51: return [3 /*break*/, 58];
@@ -318,7 +317,7 @@ function ticketFix(page) {
                     return [7 /*endfinally*/];
                 case 57: return [7 /*endfinally*/];
                 case 58:
-                    messages += emails; //putting the email values in messages to simplify search
+                    messages += emails + "\n"; //putting the email values in messages to simplify search
                     console.log(messages);
                     return [4 /*yield*/, page.waitForSelector("#header > h1")]; //title of ticket
                 case 59:
@@ -329,7 +328,7 @@ function ticketFix(page) {
                     return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, ticketTitleElement)];
                 case 61:
                     ticketTitleValue = _e.sent();
-                    messages += ticketTitleValue;
+                    messages += ticketTitleValue + "\n";
                     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
                     if (emails.includes("malwarebytes.com")) {
                         virusMalware = true;
