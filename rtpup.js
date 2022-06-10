@@ -340,6 +340,9 @@ function ticketFix(page) {
                     if (emails.includes("malwarebytes.com")) {
                         virusMalware = true;
                     }
+                    else if (emails.includes("crowdstrike")) {
+                        virusMalware = true;
+                    }
                     else if (emails.includes("etrieve@reed.edu")) { } //no tag, this is the "Notification of Staff Hire" emails
                     else if (ticketTitleValue.includes("Welcome to Reed College | Notes for your first day of work")) { } //no tag https://help.reed.edu/Ticket/Display.html?id=347871
                     else if (ticketTitleValue.includes("Welcome to Reed College")) { } //no tag
@@ -402,6 +405,9 @@ function ticketFix(page) {
                     else if (ticketTitleValue.includes("Computing at Reed")) {
                         reedAccounts = true;
                     }
+                    else if (ticketTitleValue.includes("Duo") || ticketTitleValue.includes("DUO") || ticketTitleValue.includes("duo")) {
+                        twoFactor = true;
+                    }
                     else {
                         googleDriveRegexList = [/google drive/i, /drive request/i];
                         NOgoogleDriveRegexList = [];
@@ -430,9 +436,10 @@ function ticketFix(page) {
                         NOreedAccountsRegexList = [];
                         softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /vlc/i, /quicktime/i, /zotero/i, /latex/i, /driver/i, /stata/i, /filemaker/i, /vmware/i];
                         NOsoftwareRegexList = [];
-                        thesisRegexList = [];
+                        thesisRegexList = [/thesis/i] //[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
+                        ;
                         NOthesisRegexList = [];
-                        twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i];
+                        twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i, /hardware token/i];
                         NOtwoFactorRegexList = [];
                         nameChangeRegexList = [/name change/i, /change name/i];
                         NOnameChangeRegexList = [];
