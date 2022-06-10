@@ -26,7 +26,7 @@ config prettier
 ### Proj Setup
 * Put your kerberos password in password.txt and gitignore password.txt
 * put ur kerberos username in "login"
-* Using Webstorm
+* Webstorm-Specific Setup
   * Enabled Typescript auto-comp -> JS
   * Enabled JSON5 for all JSON (so comments work) with https://www.jetbrains.com/help/webstorm/json.html#ws_json_using_schemas (this doesn't actually allow comments in package.json, couldn't fig out tho)
   * Downloaded Puppeteer library via Languages & Frameworks > Javascript > Libraries > Download

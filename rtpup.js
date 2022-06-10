@@ -109,7 +109,7 @@ function checkSpecificBox(page, checkBoxSelector) {
 function ticketFix(page) {
     var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
     return __awaiter(this, void 0, void 0, function () {
-        var titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveRegexList, NOgoogleDriveRegexList, googleGroupRegexList, NOgoogleGroupRegexList, hardwareRegexList, NOhardwareRegexList, libraryRelatedRegexList, NOlibraryRelatedRegexList, massEmailRegexList, NOmassEmailRegexList, microsoftRegexList, NOmicrosoftRegexList, networkRegexList, NOnetworkRegexList, passwordResetRegexList, NOpasswordResetRegexList, phishRegexList, NOphishRegexList, printingRegexList, NOprintingRegexList, reedAccountsRegexList, NOreedAccountsRegexList, softwareRegexList, NOsoftwareRegexList, thesisRegexList, NOthesisRegexList, twoFactorRegexList, NOtwoFactorRegexList, nameChangeRegexList, NOnameChangeRegexList, virusMalwareRegexList, NOvirusMalwareRegexList, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch;
+        var titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveRegexList, NOgoogleDriveRegexList, googleGroupRegexList, NOgoogleGroupRegexList, hardwareRegexList, NOhardwareRegexList, libraryRelatedRegexList, NOlibraryRelatedRegexList, massEmailRegexList, NOmassEmailRegexList, microsoftRegexList, NOmicrosoftRegexList, networkRegexList, NOnetworkRegexList, passwordResetRegexList, NOpasswordResetRegexList, phishRegexList, NOphishRegexList, printingRegexList, NOprintingRegexList, reedAccountsRegexList, NOreedAccountsRegexList, softwareRegexList, NOsoftwareRegexList, thesisRegexList, NOthesisRegexList, twoFactorRegexList, NOtwoFactorRegexList, nameChangeRegexList, NOnameChangeRegexList, virusMalwareRegexList, NOvirusMalwareRegexList, noTagRegexList, NOnoTagRegexList, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -282,6 +282,7 @@ function ticketFix(page) {
                     twoFactor = false;
                     nameChange = false;
                     virusMalware = false;
+                    noTag = false;
                     messages = "";
                     ticketHistorySelector = "div.history-container";
                     return [4 /*yield*/, page.waitForSelector(ticketHistorySelector)];
@@ -385,6 +386,12 @@ function ticketFix(page) {
                     else if (ticketTitleValue.includes("Reed computing account")) {
                         reedAccounts = true;
                     }
+                    else if (ticketTitleValue.includes("Your Reed computing accounts are scheduled to be closed")) {
+                        reedAccounts = true;
+                    }
+                    else if (messages.includes("Please follow the steps below to setup your Reed account")) {
+                        reedAccounts = true;
+                    }
                     else {
                         googleDriveRegexList = [/google drive/i, /drive request/i];
                         NOgoogleDriveRegexList = [];
@@ -402,16 +409,16 @@ function ticketFix(page) {
                         networkRegexList = [/wifi/i, /ethernet/i, /connection issue/i, /reed1x/i, /fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i, /trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i] ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
                         ;
                         NOnetworkRegexList = [/groups.reed.edu/];
-                        passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/] //can't use just "password" cuz ben's signature is "cis will never ask for ur password"
+                        passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/] //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
                         ;
                         NOpasswordResetRegexList = [];
                         phishRegexList = [/phish/i, /scam/i, /spam/i];
                         NOphishRegexList = [];
                         printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i];
                         NOprintingRegexList = [];
-                        reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i];
+                        reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i];
                         NOreedAccountsRegexList = [];
-                        softwareRegexList = [];
+                        softwareRegexList = [/1password/i, /one-password/i, /onepassword/i];
                         NOsoftwareRegexList = [];
                         thesisRegexList = [];
                         NOthesisRegexList = [];
@@ -421,6 +428,8 @@ function ticketFix(page) {
                         NOnameChangeRegexList = [];
                         virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,];
                         NOvirusMalwareRegexList = [];
+                        noTagRegexList = [];
+                        NOnoTagRegexList = [];
                         googleDriveMatch = googleDriveRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleDriveRegexList.some(function (rx) { return rx.test(messages); })));
                         googleGroupMatch = googleGroupRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleGroupRegexList.some(function (rx) { return rx.test(messages); })));
                         hardwareMatch = hardwareRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOhardwareRegexList.some(function (rx) { return rx.test(messages); })));
@@ -437,9 +446,11 @@ function ticketFix(page) {
                         twoFactorMatch = twoFactorRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOtwoFactorRegexList.some(function (rx) { return rx.test(messages); })));
                         nameChangeMatch = nameChangeRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOnameChangeRegexList.some(function (rx) { return rx.test(messages); })));
                         virusMalwareMatch = virusMalwareRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOvirusMalwareRegexList.some(function (rx) { return rx.test(messages); })));
+                        noTagMatch = noTagRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOnoTagRegexList.some(function (rx) { return rx.test(messages); })));
                         //TODO logic of Match bools -> real bools
                         //if no matches, flag for review
                         //if thesis, NOT microsoft
+                        //if noTag or noTagMatch, nothing tagged
                     } //end of else regex section
                     return [2 /*return*/];
             }

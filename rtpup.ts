@@ -139,6 +139,7 @@ async function ticketFix(page : Page) : Promise<void> {
     let twoFactor: boolean = false;
     let nameChange: boolean = false;
     let virusMalware: boolean = false;
+    let noTag: boolean = false;
 
     let messages: string = ""; //all emails in this string
     const ticketHistorySelector = `div.history-container`;
@@ -175,6 +176,8 @@ async function ticketFix(page : Page) : Promise<void> {
     else if(emails.includes("noreply-spamdigest@google.com")){phish=true}
     else if(emails.includes("xerox")||(emails.includes("ctx"))){printing=true}
     else if(ticketTitleValue.includes("Reed computing account")){reedAccounts=true}
+    else if(ticketTitleValue.includes("Your Reed computing accounts are scheduled to be closed")){reedAccounts=true}
+    else if(messages.includes("Please follow the steps below to setup your Reed account")){reedAccounts=true}
 
 
 
@@ -188,7 +191,7 @@ async function ticketFix(page : Page) : Promise<void> {
 
         //maybe score it??? +1 point for each regex hit, -1 point for each NOhit? BUT there can b mult tags...tricky
 
-        //i means case insensitive BTW sometimes spaces/linebreaks dont go into messages string, so you have things like "Hello Eryn,We are" etc. make sure the regex is fine w that
+        //i means case insensitive BTW sometimes spaces/linebreaks dont go into messages string, so you have things like "Hello Eryn,We are" etc. make sure the regex is fine w that TODO actually just fucking fix this, it's nice to b able to use \b word boundaries
         const googleDriveRegexList = [/google drive/i, /drive request/i]
         const NOgoogleDriveRegexList = []
         const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i]
@@ -203,15 +206,15 @@ async function ticketFix(page : Page) : Promise<void> {
         const NOmicrosoftRegexList = [/template/i] //word thesis template issues are NOT microsoft tag
         const networkRegexList = [/wifi/i,/ethernet/i,/connection issue/i,/reed1x/i,/fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i,/trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i] ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
         const NOnetworkRegexList = [/groups.reed.edu/]
-        const passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/] //can't use just "password" cuz ben's signature is "cis will never ask for ur password"
+        const passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/] //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
         const NOpasswordResetRegexList = []
         const phishRegexList = [/phish/i, /scam/i, /spam/i]
         const NOphishRegexList = []
         const printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i]
         const NOprintingRegexList = []
-        const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i]
+        const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i]
         const NOreedAccountsRegexList = []
-        const softwareRegexList = []
+        const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i]
         const NOsoftwareRegexList = []
         const thesisRegexList = []
         const NOthesisRegexList = []
@@ -221,6 +224,8 @@ async function ticketFix(page : Page) : Promise<void> {
         const NOnameChangeRegexList = []
         const virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,]
         const NOvirusMalwareRegexList = []
+        const noTagRegexList = []
+        const NOnoTagRegexList = []
 
 
         const googleDriveMatch = googleDriveRegexList.some(rx => rx.test(messages)) && (!(NOgoogleDriveRegexList.some(rx => rx.test(messages))))
@@ -239,12 +244,14 @@ async function ticketFix(page : Page) : Promise<void> {
         const twoFactorMatch = twoFactorRegexList.some(rx => rx.test(messages)) && (!(NOtwoFactorRegexList.some(rx => rx.test(messages))))
         const nameChangeMatch = nameChangeRegexList.some(rx => rx.test(messages)) && (!(NOnameChangeRegexList.some(rx => rx.test(messages))))
         const virusMalwareMatch = virusMalwareRegexList.some(rx => rx.test(messages)) && (!(NOvirusMalwareRegexList.some(rx => rx.test(messages))))
+        const noTagMatch = noTagRegexList.some(rx => rx.test(messages)) && (!(NOnoTagRegexList.some(rx => rx.test(messages))))
 
 
         //TODO logic of Match bools -> real bools
         //if no matches, flag for review
 
         //if thesis, NOT microsoft
+        //if noTag or noTagMatch, nothing tagged
     }//end of else regex section
 
 
