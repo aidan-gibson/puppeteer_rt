@@ -48,20 +48,20 @@ var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = "aigibson";
 var reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 var ticketURL = "https://help.reed.edu/Ticket/Display.html?id=";
-var currentTicket = 336632;
+var currentTicket = 336797;
 var puppeteer = require('puppeteer');
-//i means case insensitive
+//i means case insensitive, \b are word borders
 var googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i];
 var NOgoogleDriveRegexList = [];
 var googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i];
 var NOgoogleGroupRegexList = [];
-var hardwareRegexList = [];
+var hardwareRegexList = [/iMac/];
 var NOhardwareRegexList = [];
 var libraryRelatedRegexList = [/e-book/i, /library/i, /librarian/i, /IMC/, /LangLab/i];
 var NOlibraryRelatedRegexList = [];
-var massEmailRegexList = [/release email/i, /groups.reed.edu admins: Message Pending/, /mass email/i];
+var massEmailRegexList = [/release email/i, /release message/i, /groups.reed.edu admins: Message Pending/, /mass email/i, /approve(.*)Newsletter/i];
 var NOmassEmailRegexList = [];
-var microsoftRegexList = [/microsoft/i, /powerpoint/i, /excel/i, /Word/, /macro/i, /.doc\b/, /.docx\b/, /ppt\b/, /pptx\b/, /csv/, /.xl/]; //got rid of /Office/ cuz Office of the Registrar etc can be in signatures
+var microsoftRegexList = [/microsoft/i, /powerpoint/i, /\bexcel\b/i, /Word/, /\bmacro\b/i, /.doc\b/, /.docx\b/, /ppt\b/, /pptx\b/]; //got rid of /Office/ cuz Office of the Registrar etc can be in signatures, /csv/, /.xl/ cuz csv could be attached and it's totally unrelated, etc
 var NOmicrosoftRegexList = [/template/i]; //word thesis template issues are NOT microsoft tag
 var networkRegexList = [/wifi/i, /ethernet/i, /connection issue/i, /reed1x/i, /fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i, /trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i]; ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
 var NOnetworkRegexList = [/groups.reed.edu/];
@@ -71,19 +71,19 @@ var phishRegexList = [/phish/i, /scam/i, /spam/i];
 var NOphishRegexList = [/Security Updates for Reed Computers/];
 var printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i];
 var NOprintingRegexList = [];
-var reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/];
+var reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/, /auth group/i, /access IRIS/];
 var NOreedAccountsRegexList = [];
-var softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i]; //removed /\bdriver\b/i
+var softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i, /software update/i, /software upgrade/i]; //removed /\bdriver\b/i
 var NOsoftwareRegexList = [];
 var thesisRegexList = [/thesis/i]; //[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
-var NOthesisRegexList = [];
+var NOthesisRegexList = [/vpn/i];
 var twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i, /hardware token/i];
 var NOtwoFactorRegexList = [];
 var nameChangeRegexList = [/name change/i, /change name/i];
 var NOnameChangeRegexList = [];
 var virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,];
 var NOvirusMalwareRegexList = [/Security Updates for Reed Computers/];
-var noTagRegexList = [];
+var noTagRegexList = [/Events & Programs Newsletter for Reed Students/, /To:(.*)faculty@reed.edu/, /To:(.*)staff@reed.edu/, /Dorkbot Monthly/, /Banner Database Outage/];
 var NOnoTagRegexList = [];
 function run() {
     return __awaiter(this, void 0, void 0, function () {
@@ -145,7 +145,7 @@ function checkSpecificBox(page, checkBoxSelector) {
 function ticketFix(page) {
     var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
     return __awaiter(this, void 0, void 0, function () {
-        var quotedTextSelector, titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, googleDriveCheckbox, googleDriveChecked, googleGroupCheckbox, googleGroupChecked, hardwareCheckbox, hardwareChecked, libraryRelatedCheckbox, libraryRelatedChecked, massEmailCheckbox, massEmailChecked, microsoftCheckbox, microsoftChecked, networkCheckbox, networkChecked, passwordResetCheckbox, passwordResetChecked, phishCheckbox, phishChecked, printingCheckbox, printingChecked, reedAccountsCheckbox, reedAccountsChecked, softwareCheckbox, softwareChecked, i, thesisCheckbox, thesisChecked, twoFactorCheckbox, twoFactorChecked, nameChangeCheckbox, nameChangeChecked, virusMalwareCheckbox, virusMalwareChecked;
+        var quotedTextSelector, titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, googleDriveCheckbox, googleDriveChecked, googleGroupCheckbox, googleGroupChecked, hardwareCheckbox, hardwareChecked, libraryRelatedCheckbox, libraryRelatedChecked, massEmailCheckbox, massEmailChecked, microsoftCheckbox, microsoftChecked, i, networkCheckbox, networkChecked, passwordResetCheckbox, passwordResetChecked, phishCheckbox, phishChecked, printingCheckbox, printingChecked, reedAccountsCheckbox, reedAccountsChecked, softwareCheckbox, softwareChecked, i, thesisCheckbox, thesisChecked, twoFactorCheckbox, twoFactorChecked, nameChangeCheckbox, nameChangeChecked, virusMalwareCheckbox, virusMalwareChecked;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -343,7 +343,8 @@ function ticketFix(page) {
                 case 51:
                     emailValue = _e.sent() //this gives proper spacing after changing textContent to innerText
                     ;
-                    messages += emailValue + "\n";
+                    if (!emailValue.includes())
+                        messages += emailValue + "\n";
                     _e.label = 52;
                 case 52: return [3 /*break*/, 49];
                 case 53: return [3 /*break*/, 60];
@@ -376,7 +377,7 @@ function ticketFix(page) {
                     ticketTitleValue = _e.sent();
                     messages += ticketTitleValue + "\n";
                     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
-                    //console.log(emails.some(includes("schrodinger.com")))
+                    //console.log(messages)
                     if (emails.toString().includes("malwarebytes.com")) {
                         virusMalware = true;
                     }
@@ -455,6 +456,12 @@ function ticketFix(page) {
                     else if (emails.toString().includes("schrodinger.com")) {
                         noTag = true;
                     }
+                    else if (ticketTitleValue.includes("google group")) {
+                        googleGroup = true;
+                    }
+                    else if (ticketTitleValue.includes("Google Group")) {
+                        googleGroup = true;
+                    }
                     else {
                         googleDriveMatch = googleDriveRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleDriveRegexList.some(function (rx) { return rx.test(messages); })));
                         googleGroupMatch = googleGroupRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleGroupRegexList.some(function (rx) { return rx.test(messages); })));
@@ -475,60 +482,62 @@ function ticketFix(page) {
                         noTagMatch = noTagRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOnoTagRegexList.some(function (rx) { return rx.test(messages); })));
                         //logic of Match bools -> real bools
                         //this may seem redundant to have the "match" set of bools as well, but it gives extra flexibility
-                        if (googleDriveMatch) {
-                            googleDrive = true;
-                        }
-                        if (googleGroupMatch) {
-                            googleGroup = true;
-                        }
-                        if (hardwareMatch) {
-                            hardware = true;
-                        }
-                        if (libraryRelatedMatch) {
-                            libraryRelated = true;
-                        }
-                        if (massEmailMatch) {
-                            massEmail = true;
-                        }
-                        if (microsoftMatch) {
-                            microsoft = true;
-                        }
-                        if (networkMatch) {
-                            network = true;
-                        }
-                        if (phishMatch) {
-                            phish = true;
-                        }
-                        if (printingMatch) {
-                            printing = true;
-                        }
-                        if (reedAccountsMatch) {
-                            reedAccounts = true;
-                        }
-                        if (softwareMatch) {
-                            software = true;
-                        }
-                        if (twoFactorMatch) {
-                            twoFactor = true;
-                        }
-                        if (nameChangeMatch) {
-                            nameChange = true;
-                        }
-                        if (virusMalwareMatch) {
-                            virusMalware = true;
-                        }
                         if (noTagMatch) {
                             noTag = true;
                         }
-                        //keep these exceptions at bottom
-                        if (passwordResetMatch) {
-                            passwordReset = true;
-                            reedAccounts = false;
-                        } //if password reset, NOT reed account, always
-                        if (thesisMatch) {
-                            thesis = true;
-                            microsoft = false;
-                        } //if thesis, NOT microsoft, always
+                        else {
+                            if (googleDriveMatch) {
+                                googleDrive = true;
+                            }
+                            if (googleGroupMatch) {
+                                googleGroup = true;
+                            }
+                            if (hardwareMatch) {
+                                hardware = true;
+                            }
+                            if (libraryRelatedMatch) {
+                                libraryRelated = true;
+                            }
+                            if (massEmailMatch) {
+                                massEmail = true;
+                            }
+                            if (microsoftMatch) {
+                                microsoft = true;
+                            }
+                            if (networkMatch) {
+                                network = true;
+                            }
+                            if (phishMatch) {
+                                phish = true;
+                            }
+                            if (printingMatch) {
+                                printing = true;
+                            }
+                            if (reedAccountsMatch) {
+                                reedAccounts = true;
+                            }
+                            if (softwareMatch) {
+                                software = true;
+                            }
+                            if (twoFactorMatch) {
+                                twoFactor = true;
+                            }
+                            if (nameChangeMatch) {
+                                nameChange = true;
+                            }
+                            if (virusMalwareMatch) {
+                                virusMalware = true;
+                            }
+                            //keep these exceptions at bottom
+                            if (passwordResetMatch) {
+                                passwordReset = true;
+                                reedAccounts = false;
+                            } //if password reset, NOT reed account, always
+                            if (thesisMatch) {
+                                thesis = true;
+                                microsoft = false;
+                            } //if thesis, NOT microsoft, always
+                        }
                         //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
                         if (!googleDriveMatch && !googleGroupMatch && !hardwareMatch && !libraryRelatedMatch && !massEmailMatch && !microsoftMatch && !networkMatch && !passwordResetMatch && !phishMatch && !printingMatch && !reedAccountsMatch && !softwareMatch && !thesisMatch && !twoFactorMatch && !nameChangeMatch && !virusMalwareMatch && !noTagMatch && !noTag) {
                             console.log("FLAG NO REGEX MATCH " + page.url());
@@ -601,6 +610,9 @@ function ticketFix(page) {
                     microsoftChecked = _e.sent();
                     if (microsoft != microsoftChecked) {
                         console.log("Algo microsoft: " + microsoft + "Ticket microsoft: " + microsoftChecked);
+                        for (i = 0; i < microsoftRegexList.length; i++) {
+                            console.log(microsoftRegexList[i].exec(messages));
+                        }
                     }
                     return [4 /*yield*/, page.$("input[value=\"network\"]")];
                 case 83:

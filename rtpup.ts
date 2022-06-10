@@ -4,21 +4,21 @@ const pw = readFileSync('./password.txt','utf-8')
 const login = "aigibson";
 const reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 const ticketURL = "https://help.reed.edu/Ticket/Display.html?id="
-let currentTicket = 336632
+let currentTicket = 336797
 const puppeteer = require('puppeteer');
 
-//i means case insensitive
+//i means case insensitive, \b are word borders
 const googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i]
 const NOgoogleDriveRegexList = []
 const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i]
 const NOgoogleGroupRegexList = []
-const hardwareRegexList = []
+const hardwareRegexList = [/iMac/]
 const NOhardwareRegexList = []
 const libraryRelatedRegexList = [/e-book/i,/library/i, /librarian/i, /IMC/, /LangLab/i]
 const NOlibraryRelatedRegexList = []
-const massEmailRegexList = [/release email/i, /groups.reed.edu admins: Message Pending/, /mass email/i]
+const massEmailRegexList = [/release email/i, /release message/i, /groups.reed.edu admins: Message Pending/, /mass email/i, /approve(.*)Newsletter/i]
 const NOmassEmailRegexList = []
-const microsoftRegexList = [/microsoft/i, /powerpoint/i, /excel/i, /Word/, /macro/i, /.doc\b/, /.docx\b/, /ppt\b/,/pptx\b/, /csv/, /.xl/] //got rid of /Office/ cuz Office of the Registrar etc can be in signatures
+const microsoftRegexList = [/microsoft/i, /powerpoint/i, /\bexcel\b/i, /Word/, /\bmacro\b/i, /.doc\b/, /.docx\b/, /ppt\b/,/pptx\b/] //got rid of /Office/ cuz Office of the Registrar etc can be in signatures, /csv/, /.xl/ cuz csv could be attached and it's totally unrelated, etc
 const NOmicrosoftRegexList = [/template/i] //word thesis template issues are NOT microsoft tag
 const networkRegexList = [/wifi/i,/ethernet/i,/connection issue/i,/reed1x/i,/fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i,/trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i] ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
 const NOnetworkRegexList = [/groups.reed.edu/]
@@ -28,19 +28,19 @@ const phishRegexList = [/phish/i, /scam/i, /spam/i]
 const NOphishRegexList = [/Security Updates for Reed Computers/]
 const printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i]
 const NOprintingRegexList = []
-const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/]
+const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/, /auth group/i, /access IRIS/]
 const NOreedAccountsRegexList = []
-const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i] //removed /\bdriver\b/i
+const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i, /software update/i, /software upgrade/i] //removed /\bdriver\b/i
 const NOsoftwareRegexList = []
 const thesisRegexList = [/thesis/i]//[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
-const NOthesisRegexList = []
+const NOthesisRegexList = [/vpn/i]
 const twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i, /hardware token/i]
 const NOtwoFactorRegexList = []
 const nameChangeRegexList = [/name change/i, /change name/i]
 const NOnameChangeRegexList = []
 const virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,]
 const NOvirusMalwareRegexList = [/Security Updates for Reed Computers/]
-const noTagRegexList = []
+const noTagRegexList = [/Events & Programs Newsletter for Reed Students/, /To:(.*)faculty@reed.edu/, /To:(.*)staff@reed.edu/, /Dorkbot Monthly/, /Banner Database Outage/]
 const NOnoTagRegexList = []
 
 async function run() {
@@ -188,6 +188,7 @@ async function ticketFix(page : Page) : Promise<void> {
     let emailStanzas = await page.$$(ticketHistorySelector);
     for await(let emailStanza of emailStanzas){
         let emailValue = await page.evaluate(el => el.innerText, emailStanza) //this gives proper spacing after changing textContent to innerText
+        if(!emailValue.includes())
         messages+=emailValue+"\n"
     }
     messages+=emails+"\n" //putting the email values in messages to simplify search
@@ -198,7 +199,7 @@ async function ticketFix(page : Page) : Promise<void> {
 
     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
 
-    //console.log(emails.some(includes("schrodinger.com")))
+    //console.log(messages)
     if (emails.toString().includes("malwarebytes.com")){virusMalware=true}
     else if(emails.toString().includes("crowdstrike")){virusMalware=true}
     else if(emails.toString().includes("etrieve@reed.edu")){noTag=true}//no tag, this is the "Notification of Staff Hire" emails
@@ -225,6 +226,8 @@ async function ticketFix(page : Page) : Promise<void> {
     else if(ticketTitleValue.includes("Computing at Reed")){reedAccounts=true}
     else if(ticketTitleValue.includes("Duo")||ticketTitleValue.includes("DUO")||ticketTitleValue.includes("duo")){twoFactor=true}
     else if(emails.toString().includes("schrodinger.com")){noTag=true}
+    else if(ticketTitleValue.includes("google group")){googleGroup=true}
+    else if(ticketTitleValue.includes("Google Group")){googleGroup=true}
 
 
 
@@ -262,26 +265,63 @@ async function ticketFix(page : Page) : Promise<void> {
 
         //logic of Match bools -> real bools
         //this may seem redundant to have the "match" set of bools as well, but it gives extra flexibility
-        if(googleDriveMatch){googleDrive=true}
-        if(googleGroupMatch){googleGroup=true}
-        if(hardwareMatch){hardware=true}
-        if(libraryRelatedMatch){libraryRelated=true}
-        if(massEmailMatch){massEmail=true}
-        if(microsoftMatch){microsoft=true}
-        if(networkMatch){network=true}
-        if(phishMatch){phish=true}
-        if(printingMatch){printing=true}
-        if(reedAccountsMatch){reedAccounts=true}
-        if(softwareMatch){software=true}
-        if(twoFactorMatch){twoFactor=true}
-        if(nameChangeMatch){nameChange=true}
-        if(virusMalwareMatch){virusMalware=true}
         if(noTagMatch){noTag=true}
+        else {
 
-        //keep these exceptions at bottom
-        if(passwordResetMatch){passwordReset=true;reedAccounts=false} //if password reset, NOT reed account, always
-        if(thesisMatch){thesis=true; microsoft=false} //if thesis, NOT microsoft, always
+            if (googleDriveMatch) {
+                googleDrive = true
+            }
+            if (googleGroupMatch) {
+                googleGroup = true
+            }
+            if (hardwareMatch) {
+                hardware = true
+            }
+            if (libraryRelatedMatch) {
+                libraryRelated = true
+            }
+            if (massEmailMatch) {
+                massEmail = true
+            }
+            if (microsoftMatch) {
+                microsoft = true
+            }
+            if (networkMatch) {
+                network = true
+            }
+            if (phishMatch) {
+                phish = true
+            }
+            if (printingMatch) {
+                printing = true
+            }
+            if (reedAccountsMatch) {
+                reedAccounts = true
+            }
+            if (softwareMatch) {
+                software = true
+            }
+            if (twoFactorMatch) {
+                twoFactor = true
+            }
+            if (nameChangeMatch) {
+                nameChange = true
+            }
+            if (virusMalwareMatch) {
+                virusMalware = true
+            }
 
+
+            //keep these exceptions at bottom
+            if (passwordResetMatch) {
+                passwordReset = true;
+                reedAccounts = false
+            } //if password reset, NOT reed account, always
+            if (thesisMatch) {
+                thesis = true;
+                microsoft = false
+            } //if thesis, NOT microsoft, always
+        }
         //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
         if(!googleDriveMatch&&!googleGroupMatch&&!hardwareMatch&&!libraryRelatedMatch&&!massEmailMatch&&!microsoftMatch&&!networkMatch&&!passwordResetMatch&&!phishMatch&&!printingMatch&&!reedAccountsMatch&&!softwareMatch&&!thesisMatch&&!twoFactorMatch&&!nameChangeMatch&&!virusMalwareMatch&&!noTagMatch&&!noTag){console.log("FLAG NO REGEX MATCH "+page.url())}
 
@@ -325,7 +365,12 @@ async function ticketFix(page : Page) : Promise<void> {
 
     const microsoftCheckbox = await page.$(`input[value="microsoft"]`);
     const microsoftChecked = await (await microsoftCheckbox.getProperty('checked')).jsonValue();
-    if(microsoft!=microsoftChecked){console.log("Algo microsoft: "+microsoft+ "Ticket microsoft: "+microsoftChecked)}
+    if(microsoft!=microsoftChecked){
+        console.log("Algo microsoft: "+microsoft+ "Ticket microsoft: "+microsoftChecked)
+        for(let i=0;i<microsoftRegexList.length;i++) {
+            console.log(microsoftRegexList[i].exec(messages))
+        }
+    }
 
     const networkCheckbox = await page.$(`input[value="network"]`);
     const networkChecked = await (await networkCheckbox.getProperty('checked')).jsonValue();
@@ -378,6 +423,7 @@ async function ticketFix(page : Page) : Promise<void> {
 
 
     console.log("End")
+    //console.log(messages)
     //TODO also the affiliation stuff! check how the prospie logic works again. or maybe dont test it for now tbh, one thing at a time
 
 

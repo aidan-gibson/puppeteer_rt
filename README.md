@@ -2,6 +2,8 @@
 This will only go as far back at Aug '21 at most (ergo two-factor tags are potentially valid for every ticket etc)
 
 Not using try/catch cuz I want it to fail if it fails; this is not a production constant script it's a one-time thing.
+
+False positives > False negatives
 ### todo
 maybe tweak applicant/prospie flag logic?
 
