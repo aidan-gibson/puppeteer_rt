@@ -48,7 +48,7 @@ var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = "aigibson";
 var reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 var ticketURL = "https://help.reed.edu/Ticket/Display.html?id=";
-var currentTicket = 346555;
+var currentTicket = 346157;
 var puppeteer = require('puppeteer');
 function run() {
     return __awaiter(this, void 0, void 0, function () {
@@ -288,13 +288,14 @@ function ticketFix(page) {
                     virusMalware = false;
                     noTag = false;
                     messages = "";
-                    ticketHistorySelector = "div.history-container";
+                    ticketHistorySelector = "div.history-container > div.message";
                     return [4 /*yield*/, page.waitForSelector(ticketHistorySelector)];
                 case 46:
                     _e.sent();
                     return [4 /*yield*/, page.$$(ticketHistorySelector)];
                 case 47:
                     emailStanzas = _e.sent();
+                    console.log(emailStanzas.length);
                     _e.label = 48;
                 case 48:
                     _e.trys.push([48, 54, 55, 60]);
@@ -304,10 +305,13 @@ function ticketFix(page) {
                 case 50:
                     if (!(emailStanzas_1_1 = _e.sent(), !emailStanzas_1_1.done)) return [3 /*break*/, 53];
                     emailStanza = emailStanzas_1_1.value;
-                    return [4 /*yield*/, page.evaluate(function (el) { return el.innerText; }, emailStanza)]; //this gives proper spacing after changing textContent to innerText
+                    return [4 /*yield*/, page.evaluate(function (el) { return el.innerText; }, emailStanza)
+                        //only add it if it's a comment, correspondance, or the initial ticket opening. we don't want others, esp "Support Tags xyz deleted" which could falsely re-trigger the regex for that tag
+                    ]; //this gives proper spacing after changing textContent to innerText
                 case 51:
                     emailValue = _e.sent() //this gives proper spacing after changing textContent to innerText
                     ;
+                    //only add it if it's a comment, correspondance, or the initial ticket opening. we don't want others, esp "Support Tags xyz deleted" which could falsely re-trigger the regex for that tag
                     messages += emailValue + "\n";
                     _e.label = 52;
                 case 52: return [3 /*break*/, 49];

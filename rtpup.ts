@@ -4,7 +4,7 @@ const pw = readFileSync('./password.txt','utf-8')
 const login = "aigibson";
 const reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 const ticketURL = "https://help.reed.edu/Ticket/Display.html?id="
-let currentTicket = 346555
+let currentTicket = 346157
 const puppeteer = require('puppeteer');
 
 
@@ -45,7 +45,7 @@ async function checkSpecificBox(page : Page, checkBoxSelector: string) : Promise
 }
 async function ticketFix(page : Page) : Promise<void> {
 
-    //click "Show all quoted text" anchor
+    //click "Show all quoted text" anchor; necessary if the init ticket has "show quoted text" and we need it like here https://help.reed.edu/Ticket/Display.html?id=346157
     const quotedTextSelector = `#ticket-${currentTicket}-history > div > div.titlebox-title > span.right > a:nth-child(1)`
     await page.waitForSelector(quotedTextSelector)
     await page.click(quotedTextSelector)
@@ -148,12 +148,14 @@ async function ticketFix(page : Page) : Promise<void> {
     let noTag: boolean = false;
 
     let messages: string = ""; //all emails in this string
-    const ticketHistorySelector = `div.history-container`;
+    const ticketHistorySelector = `div.history-container > div.message`;
     await page.waitForSelector(ticketHistorySelector);
     let emailStanzas = await page.$$(ticketHistorySelector);
+    console.log(emailStanzas.length)
     for await(let emailStanza of emailStanzas){
         let emailValue = await page.evaluate(el => el.innerText, emailStanza) //this gives proper spacing after changing textContent to innerText
 
+        //only add it if it's a comment, correspondance, or the initial ticket opening. we don't want others, esp "Support Tags xyz deleted" which could falsely re-trigger the regex for that tag
         messages+=emailValue+"\n"
     }
     messages+=emails+"\n" //putting the email values in messages to simplify search
@@ -161,7 +163,6 @@ async function ticketFix(page : Page) : Promise<void> {
     await page.waitForSelector("#header > h1") //title of ticket
     let ticketTitleElement = await page.$("#header > h1");
     let ticketTitleValue = await page.evaluate(el => el.textContent, ticketTitleElement);
-
     messages+=ticketTitleValue+"\n"
 
     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
