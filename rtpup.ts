@@ -4,11 +4,11 @@ const pw = readFileSync('./password.txt','utf-8')
 const login = "aigibson";
 const reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 const ticketURL = "https://help.reed.edu/Ticket/Display.html?id="
-let currentTicket = 336611
+let currentTicket = 336632
 const puppeteer = require('puppeteer');
 
 //i means case insensitive
-const googleDriveRegexList = [/google drive/i, /drive request/i]
+const googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i]
 const NOgoogleDriveRegexList = []
 const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i]
 const NOgoogleGroupRegexList = []
@@ -25,7 +25,7 @@ const NOnetworkRegexList = [/groups.reed.edu/]
 const passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/] //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
 const NOpasswordResetRegexList = []
 const phishRegexList = [/phish/i, /scam/i, /spam/i]
-const NOphishRegexList = []
+const NOphishRegexList = [/Security Updates for Reed Computers/]
 const printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i]
 const NOprintingRegexList = []
 const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/]
@@ -39,13 +39,13 @@ const NOtwoFactorRegexList = []
 const nameChangeRegexList = [/name change/i, /change name/i]
 const NOnameChangeRegexList = []
 const virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,]
-const NOvirusMalwareRegexList = []
+const NOvirusMalwareRegexList = [/Security Updates for Reed Computers/]
 const noTagRegexList = []
 const NOnoTagRegexList = []
 
 async function run() {
     const browser = await puppeteer.launch({
-                                               devtools: true, //this also forces {headless: false}
+                                               //devtools: true, //this also forces {headless: false}
                                                //dumpio: true //captures all console messages to output https://stackoverflow.com/questions/47539043/how-to-get-all-console-messages-with-puppeteer-including-errors-csp-violations
                                            })
     //const page = await browser.newPage()
@@ -157,7 +157,7 @@ async function ticketFix(page : Page) : Promise<void> {
         emails.push(emailValue);
         if(!(emailValue.includes("@reed.edu"))){nonReedEmail=true;}
     }
-    if (!emeritus && !student && !affiliate && !alumni && !staff && !faculty && !emails.includes("@reed.edu")){
+    if (!emeritus && !student && !affiliate && !alumni && !staff && !faculty && !emails.toString().includes("@reed.edu")){
         nonReedEmail = true;
     }
 
@@ -198,24 +198,25 @@ async function ticketFix(page : Page) : Promise<void> {
 
     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
 
-    if (emails.includes("malwarebytes.com")){virusMalware=true}
-    else if(emails.includes("crowdstrike")){virusMalware=true}
-    else if(emails.includes("etrieve@reed.edu")){noTag=true}//no tag, this is the "Notification of Staff Hire" emails
+    //console.log(emails.some(includes("schrodinger.com")))
+    if (emails.toString().includes("malwarebytes.com")){virusMalware=true}
+    else if(emails.toString().includes("crowdstrike")){virusMalware=true}
+    else if(emails.toString().includes("etrieve@reed.edu")){noTag=true}//no tag, this is the "Notification of Staff Hire" emails
     else if(ticketTitleValue.includes("Welcome to Reed College | Notes for your first day of work")){}//no tag https://help.reed.edu/Ticket/Display.html?id=347871
     else if(ticketTitleValue.includes("Welcome to Reed College")){noTag=true}//no tag
-    else if(emails.includes("msgappr@groups.reed.edu")||ticketTitleValue.includes("groups.reed.edu admins: Message Pending")){massEmail=true}
+    else if(emails.toString().includes("msgappr@groups.reed.edu")||ticketTitleValue.includes("groups.reed.edu admins: Message Pending")){massEmail=true}
     else if(ticketTitleValue.includes("Shared Drive Request")){googleDrive=true}
     else if(ticketTitleValue.includes("Google Group Request")){googleGroup=true}
     else if(ticketTitleValue.includes("[Ask a librarian]")){libraryRelated=true}
-    else if(emails.includes("er-problem-report@reed.edu")){libraryRelated=true}
-    else if(emails.includes("msonlineservicesteam@microsoftonline.com")){microsoft=true; passwordReset=true;}
-    else if(emails.includes("@microsoft.com")){microsoft=true}
-    else if(emails.includes("@microsoftonline.com")){microsoft=true}
+    else if(emails.toString().includes("er-problem-report@reed.edu")){libraryRelated=true}
+    else if(emails.toString().includes("msonlineservicesteam@microsoftonline.com")){microsoft=true; passwordReset=true;}
+    else if(emails.toString().includes("@microsoft.com")){microsoft=true}
+    else if(emails.toString().includes("@microsoftonline.com")){microsoft=true}
     else if(ticketTitleValue.includes("Wireless Maintenance")){network=true}
     else if(ticketTitleValue.includes("ipp.reed.edu")){network=true; printing = true;}
     else if(ticketTitleValue.includes("Kerberos password reset")){passwordReset=true} //https://help.reed.edu/Ticket/Display.html?id=344626
-    else if(emails.includes("noreply-spamdigest@google.com")){phish=true}
-    else if(emails.includes("xerox")||(emails.includes("ctx"))){printing=true}
+    else if(emails.toString().includes("noreply-spamdigest@google.com")){phish=true}
+    else if(emails.toString().includes("xerox")||(emails.toString().includes("ctx"))){printing=true}
     else if(ticketTitleValue.includes("Reed computing account")){reedAccounts=true}
     else if(ticketTitleValue.includes("Your Reed computing accounts are scheduled to be closed")){reedAccounts=true}
     else if(messages.includes("Please follow the steps below to setup your Reed account")){reedAccounts=true}
@@ -223,6 +224,7 @@ async function ticketFix(page : Page) : Promise<void> {
     else if(ticketTitleValue.includes("Account Tool")){reedAccounts=true}
     else if(ticketTitleValue.includes("Computing at Reed")){reedAccounts=true}
     else if(ticketTitleValue.includes("Duo")||ticketTitleValue.includes("DUO")||ticketTitleValue.includes("duo")){twoFactor=true}
+    else if(emails.toString().includes("schrodinger.com")){noTag=true}
 
 
 
@@ -281,7 +283,7 @@ async function ticketFix(page : Page) : Promise<void> {
         if(thesisMatch){thesis=true; microsoft=false} //if thesis, NOT microsoft, always
 
         //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
-        if(!googleDriveMatch&&!googleGroupMatch&&!hardwareMatch&&!libraryRelatedMatch&&!massEmailMatch&&!microsoftMatch&&!networkMatch&&!passwordResetMatch&&!phishMatch&&!printingMatch&&!reedAccountsMatch&&!softwareMatch&&!thesisMatch&&!twoFactorMatch&&!nameChangeMatch&&!virusMalwareMatch&&!noTagMatch){console.log("FLAG NO REGEX MATCH "+page.url())}
+        if(!googleDriveMatch&&!googleGroupMatch&&!hardwareMatch&&!libraryRelatedMatch&&!massEmailMatch&&!microsoftMatch&&!networkMatch&&!passwordResetMatch&&!phishMatch&&!printingMatch&&!reedAccountsMatch&&!softwareMatch&&!thesisMatch&&!twoFactorMatch&&!nameChangeMatch&&!virusMalwareMatch&&!noTagMatch&&!noTag){console.log("FLAG NO REGEX MATCH "+page.url())}
 
     }//end of else regex section
 
@@ -374,6 +376,8 @@ async function ticketFix(page : Page) : Promise<void> {
     const virusMalwareChecked = await (await virusMalwareCheckbox.getProperty('checked')).jsonValue();
     if(virusMalware!=virusMalwareChecked){console.log("Algo virusMalware: "+virusMalware+ "Ticket virusMalware: "+virusMalwareChecked)}
 
+
+    console.log("End")
     //TODO also the affiliation stuff! check how the prospie logic works again. or maybe dont test it for now tbh, one thing at a time
 
 

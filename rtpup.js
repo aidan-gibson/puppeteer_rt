@@ -48,10 +48,10 @@ var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = "aigibson";
 var reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 var ticketURL = "https://help.reed.edu/Ticket/Display.html?id=";
-var currentTicket = 336611;
+var currentTicket = 336632;
 var puppeteer = require('puppeteer');
 //i means case insensitive
-var googleDriveRegexList = [/google drive/i, /drive request/i];
+var googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i];
 var NOgoogleDriveRegexList = [];
 var googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i];
 var NOgoogleGroupRegexList = [];
@@ -68,7 +68,7 @@ var NOnetworkRegexList = [/groups.reed.edu/];
 var passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/]; //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
 var NOpasswordResetRegexList = [];
 var phishRegexList = [/phish/i, /scam/i, /spam/i];
-var NOphishRegexList = [];
+var NOphishRegexList = [/Security Updates for Reed Computers/];
 var printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i];
 var NOprintingRegexList = [];
 var reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/];
@@ -82,7 +82,7 @@ var NOtwoFactorRegexList = [];
 var nameChangeRegexList = [/name change/i, /change name/i];
 var NOnameChangeRegexList = [];
 var virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,];
-var NOvirusMalwareRegexList = [];
+var NOvirusMalwareRegexList = [/Security Updates for Reed Computers/];
 var noTagRegexList = [];
 var NOnoTagRegexList = [];
 function run() {
@@ -91,8 +91,8 @@ function run() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, puppeteer.launch({
-                        devtools: true, //this also forces {headless: false}
-                        //dumpio: true //captures all console messages to output https://stackoverflow.com/questions/47539043/how-to-get-all-console-messages-with-puppeteer-including-errors-csp-violations
+                    //devtools: true, //this also forces {headless: false}
+                    //dumpio: true //captures all console messages to output https://stackoverflow.com/questions/47539043/how-to-get-all-console-messages-with-puppeteer-including-errors-csp-violations
                     })
                     //const page = await browser.newPage()
                 ];
@@ -302,7 +302,7 @@ function ticketFix(page) {
                     return [7 /*endfinally*/];
                 case 44: return [7 /*endfinally*/];
                 case 45:
-                    if (!emeritus && !student && !affiliate && !alumni && !staff && !faculty && !emails.includes("@reed.edu")) {
+                    if (!emeritus && !student && !affiliate && !alumni && !staff && !faculty && !emails.toString().includes("@reed.edu")) {
                         nonReedEmail = true;
                     }
                     googleDrive = false;
@@ -376,20 +376,21 @@ function ticketFix(page) {
                     ticketTitleValue = _e.sent();
                     messages += ticketTitleValue + "\n";
                     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
-                    if (emails.includes("malwarebytes.com")) {
+                    //console.log(emails.some(includes("schrodinger.com")))
+                    if (emails.toString().includes("malwarebytes.com")) {
                         virusMalware = true;
                     }
-                    else if (emails.includes("crowdstrike")) {
+                    else if (emails.toString().includes("crowdstrike")) {
                         virusMalware = true;
                     }
-                    else if (emails.includes("etrieve@reed.edu")) {
+                    else if (emails.toString().includes("etrieve@reed.edu")) {
                         noTag = true;
                     } //no tag, this is the "Notification of Staff Hire" emails
                     else if (ticketTitleValue.includes("Welcome to Reed College | Notes for your first day of work")) { } //no tag https://help.reed.edu/Ticket/Display.html?id=347871
                     else if (ticketTitleValue.includes("Welcome to Reed College")) {
                         noTag = true;
                     } //no tag
-                    else if (emails.includes("msgappr@groups.reed.edu") || ticketTitleValue.includes("groups.reed.edu admins: Message Pending")) {
+                    else if (emails.toString().includes("msgappr@groups.reed.edu") || ticketTitleValue.includes("groups.reed.edu admins: Message Pending")) {
                         massEmail = true;
                     }
                     else if (ticketTitleValue.includes("Shared Drive Request")) {
@@ -401,17 +402,17 @@ function ticketFix(page) {
                     else if (ticketTitleValue.includes("[Ask a librarian]")) {
                         libraryRelated = true;
                     }
-                    else if (emails.includes("er-problem-report@reed.edu")) {
+                    else if (emails.toString().includes("er-problem-report@reed.edu")) {
                         libraryRelated = true;
                     }
-                    else if (emails.includes("msonlineservicesteam@microsoftonline.com")) {
+                    else if (emails.toString().includes("msonlineservicesteam@microsoftonline.com")) {
                         microsoft = true;
                         passwordReset = true;
                     }
-                    else if (emails.includes("@microsoft.com")) {
+                    else if (emails.toString().includes("@microsoft.com")) {
                         microsoft = true;
                     }
-                    else if (emails.includes("@microsoftonline.com")) {
+                    else if (emails.toString().includes("@microsoftonline.com")) {
                         microsoft = true;
                     }
                     else if (ticketTitleValue.includes("Wireless Maintenance")) {
@@ -424,10 +425,10 @@ function ticketFix(page) {
                     else if (ticketTitleValue.includes("Kerberos password reset")) {
                         passwordReset = true;
                     } //https://help.reed.edu/Ticket/Display.html?id=344626
-                    else if (emails.includes("noreply-spamdigest@google.com")) {
+                    else if (emails.toString().includes("noreply-spamdigest@google.com")) {
                         phish = true;
                     }
-                    else if (emails.includes("xerox") || (emails.includes("ctx"))) {
+                    else if (emails.toString().includes("xerox") || (emails.toString().includes("ctx"))) {
                         printing = true;
                     }
                     else if (ticketTitleValue.includes("Reed computing account")) {
@@ -450,6 +451,9 @@ function ticketFix(page) {
                     }
                     else if (ticketTitleValue.includes("Duo") || ticketTitleValue.includes("DUO") || ticketTitleValue.includes("duo")) {
                         twoFactor = true;
+                    }
+                    else if (emails.toString().includes("schrodinger.com")) {
+                        noTag = true;
                     }
                     else {
                         googleDriveMatch = googleDriveRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleDriveRegexList.some(function (rx) { return rx.test(messages); })));
@@ -526,7 +530,7 @@ function ticketFix(page) {
                             microsoft = false;
                         } //if thesis, NOT microsoft, always
                         //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
-                        if (!googleDriveMatch && !googleGroupMatch && !hardwareMatch && !libraryRelatedMatch && !massEmailMatch && !microsoftMatch && !networkMatch && !passwordResetMatch && !phishMatch && !printingMatch && !reedAccountsMatch && !softwareMatch && !thesisMatch && !twoFactorMatch && !nameChangeMatch && !virusMalwareMatch && !noTagMatch) {
+                        if (!googleDriveMatch && !googleGroupMatch && !hardwareMatch && !libraryRelatedMatch && !massEmailMatch && !microsoftMatch && !networkMatch && !passwordResetMatch && !phishMatch && !printingMatch && !reedAccountsMatch && !softwareMatch && !thesisMatch && !twoFactorMatch && !nameChangeMatch && !virusMalwareMatch && !noTagMatch && !noTag) {
                             console.log("FLAG NO REGEX MATCH " + page.url());
                         }
                     } //end of else regex section
@@ -701,6 +705,7 @@ function ticketFix(page) {
                     if (virusMalware != virusMalwareChecked) {
                         console.log("Algo virusMalware: " + virusMalware + "Ticket virusMalware: " + virusMalwareChecked);
                     }
+                    console.log("End");
                     return [2 /*return*/];
             }
         });
