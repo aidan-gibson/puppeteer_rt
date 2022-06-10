@@ -3,7 +3,10 @@ import { readFileSync } from 'fs';
 const pw = readFileSync('./password.txt','utf-8')
 const login = "aigibson";
 const reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
+const ticketURL = "https://help.reed.edu/Ticket/Display.html?id="
+let currentTicket = 346555
 const puppeteer = require('puppeteer');
+
 
 async function run() {
     const browser = await puppeteer.launch({
@@ -13,7 +16,7 @@ async function run() {
     //const page = await browser.newPage()
     const [page] = await browser.pages(); //this fixes extra empty tab being open instead of above line
     await page.setViewport({ width: 850, height: 800}); //doesn't matter
-    await page.goto(reedLoginURL+"https://help.reed.edu/Ticket/Display.html?id=346157")
+    await page.goto(reedLoginURL+ticketURL+currentTicket)
     await page.type('[name="login"]', login)
     await page.type('[name="password"]', pw)
     await page.click(`button[class="btn btn-primary pull-right"]`)
@@ -42,10 +45,14 @@ async function checkSpecificBox(page : Page, checkBoxSelector: string) : Promise
 }
 async function ticketFix(page : Page) : Promise<void> {
 
+    //click "Show all quoted text" anchor
+    const quotedTextSelector = `#ticket-${currentTicket}-history > div > div.titlebox-title > span.right > a:nth-child(1)`
+    await page.waitForSelector(quotedTextSelector)
+    await page.click(quotedTextSelector)
+
     //TITLE EMERITUS SECTION
     const titleSelector = `.CustomField__Title_ > span.value`;//must check if there are multiple
     await page.waitForSelector(titleSelector); //TODO this waits for FIRST selector matching, what if the first loads faster than the second??
-
     //this was from when I didn't realize there could b mult requestors
     //let titleElement = await page.$(titleSelector);
     //let titleValue = await page.evaluate(el => el.textContent, titleElement);
@@ -145,7 +152,8 @@ async function ticketFix(page : Page) : Promise<void> {
     await page.waitForSelector(ticketHistorySelector);
     let emailStanzas = await page.$$(ticketHistorySelector);
     for await(let emailStanza of emailStanzas){
-        let emailValue = await page.evaluate(el => el.innerText, emailStanza)
+        let emailValue = await page.evaluate(el => el.innerText, emailStanza) //this gives proper spacing after changing textContent to innerText
+
         messages+=emailValue+"\n"
     }
     messages+=emails+"\n" //putting the email values in messages to simplify search
@@ -283,26 +291,28 @@ async function ticketFix(page : Page) : Promise<void> {
 
     //PAGE CHANGE
 
-    let currURL:string = page.url();
-    //replace Display with Modify
-    let modifyURL:string = currURL.replace('Display', 'Modify');
-    await page.goto(modifyURL);
-
-    //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
-
-    console.log("Current Ticket: "+page.url())
-
-    const googleDriveCheckbox = await page.$(`input[value="google drive"]`);
-    const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue();
-    if(googleDrive!=googleDriveChecked){console.log("Algo Google Drive: "+googleDrive+ "Ticket Google Drive: "+googleDriveChecked)}
-
-    const googleGroupCheckbox = await page.$(`input[value="google group"]`);
-    const googleGroupChecked = await (await googleGroupCheckbox.getProperty('checked')).jsonValue();
-    if(googleGroup!=googleGroupChecked){console.log("Algo Google Group: "+googleGroup+ "Ticket Google Group: "+googleGroupChecked)}
-
-    const hardwareCheckbox = await page.$(`input[value="hardware"]`);
-    const hardwareChecked = await (await hardwareCheckbox.getProperty('checked')).jsonValue();
-    if(hardware!=hardwareChecked){console.log("Algo Hardware: "+hardware+ "Ticket Hardware: "+hardwareChecked)}
+    // let currURL:string = page.url();
+    // //replace Display with Modify
+    // let modifyURL:string = currURL.replace('Display', 'Modify');
+    // await page.goto(modifyURL);
+    //
+    // //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
+    //
+    // //TODO remember (for older tickets especially) the requestor affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
+    //
+    // console.log("Current Ticket: "+page.url())
+    //
+    // const googleDriveCheckbox = await page.$(`input[value="google drive"]`);
+    // const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue();
+    // if(googleDrive!=googleDriveChecked){console.log("Algo Google Drive: "+googleDrive+ "Ticket Google Drive: "+googleDriveChecked)}
+    //
+    // const googleGroupCheckbox = await page.$(`input[value="google group"]`);
+    // const googleGroupChecked = await (await googleGroupCheckbox.getProperty('checked')).jsonValue();
+    // if(googleGroup!=googleGroupChecked){console.log("Algo Google Group: "+googleGroup+ "Ticket Google Group: "+googleGroupChecked)}
+    //
+    // const hardwareCheckbox = await page.$(`input[value="hardware"]`);
+    // const hardwareChecked = await (await hardwareCheckbox.getProperty('checked')).jsonValue();
+    // if(hardware!=hardwareChecked){console.log("Algo Hardware: "+hardware+ "Ticket Hardware: "+hardwareChecked)}
 
 
 
