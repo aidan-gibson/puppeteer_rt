@@ -48,7 +48,7 @@ var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = "aigibson";
 var reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 var month = "https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=Queue%20%3D%20%27cus%27%20AND%20Created%20%3C%20%272022-04-01%27%20AND%20Created%20%3E%20%272022-02-28%27&RowsPerPage=50&SavedChartSearchId=new&SavedSearchId=new"; //click on links which propagate, but swap Display with Modify in URL; ie from https://help.reed.edu/Ticket/Display.html?id=339418 to https://help.reed.edu/Ticket/Modify.html?id=339418
-var puppeteer = require('puppeteer');
+var puppeteer = require('puppeteer'); //a
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var browser, page;
