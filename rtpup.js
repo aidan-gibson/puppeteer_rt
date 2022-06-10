@@ -464,10 +464,62 @@ function ticketFix(page) {
                         nameChangeMatch = nameChangeRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOnameChangeRegexList.some(function (rx) { return rx.test(messages); })));
                         virusMalwareMatch = virusMalwareRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOvirusMalwareRegexList.some(function (rx) { return rx.test(messages); })));
                         noTagMatch = noTagRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOnoTagRegexList.some(function (rx) { return rx.test(messages); })));
-                        //TODO logic of Match bools -> real bools
-                        //if no matches, flag for review
-                        //if thesis, NOT microsoft
-                        //if noTag or noTagMatch, nothing tagged
+                        //logic of Match bools -> real bools
+                        //this may seem redundant to have the "match" set of bools as well, but it gives extra flexibility
+                        if (googleDriveMatch) {
+                            googleDrive = true;
+                        }
+                        if (googleGroupMatch) {
+                            googleGroup = true;
+                        }
+                        if (hardwareMatch) {
+                            hardware = true;
+                        }
+                        if (libraryRelatedMatch) {
+                            libraryRelated = true;
+                        }
+                        if (massEmailMatch) {
+                            massEmail = true;
+                        }
+                        if (microsoftMatch) {
+                            microsoft = true;
+                        }
+                        if (networkMatch) {
+                            network = true;
+                        }
+                        if (passwordResetMatch) {
+                            passwordReset = true;
+                        }
+                        if (phishMatch) {
+                            phish = true;
+                        }
+                        if (printingMatch) {
+                            printing = true;
+                        }
+                        if (reedAccountsMatch) {
+                            reedAccounts = true;
+                        }
+                        if (softwareMatch) {
+                            software = true;
+                        }
+                        if (thesisMatch) {
+                            thesis = true;
+                            microsoft = false;
+                        } //if thesis, NOT microsoft, always
+                        if (twoFactorMatch) {
+                            twoFactor = true;
+                        }
+                        if (nameChangeMatch) {
+                            nameChange = true;
+                        }
+                        if (virusMalwareMatch) {
+                            virusMalware = true;
+                        }
+                        if (noTagMatch) {
+                            noTag = true;
+                        } //currently not using, but idk might come in handy(:
+                        //TODO if no matches, flag for review
+                        //TODO if noTag or noTagMatch, nothing tagged
                     } //end of else regex section
                     return [2 /*return*/];
             }

@@ -18,7 +18,7 @@ If going back thru old tickets, do not modify affiliation!!!!!!!!! only mod old 
 
 resolve when mult correct
 
-look thru "TODO"s in the code
+look thru "TODO"s in the code, check ALL comments as well
 
 document everything clearly, go thru warnings etc, leave clear instructions on how to run for future CUS staff
 
