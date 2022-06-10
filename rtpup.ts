@@ -148,18 +148,14 @@ async function ticketFix(page : Page) : Promise<void> {
     let noTag: boolean = false;
 
     let messages: string = ""; //all emails in this string
-    const ticketHistorySelector = `div.history-container > div.message`;
+    const ticketHistorySelector = `div.history-container > div.message`; //only add it if it's a comment, correspondance, or the initial ticket opening. we don't want others, esp "Support Tags xyz deleted" which could falsely re-trigger the regex for that tag. message class is only transaction we're interested in
     await page.waitForSelector(ticketHistorySelector);
     let emailStanzas = await page.$$(ticketHistorySelector);
-    console.log(emailStanzas.length)
     for await(let emailStanza of emailStanzas){
         let emailValue = await page.evaluate(el => el.innerText, emailStanza) //this gives proper spacing after changing textContent to innerText
-
-        //only add it if it's a comment, correspondance, or the initial ticket opening. we don't want others, esp "Support Tags xyz deleted" which could falsely re-trigger the regex for that tag
         messages+=emailValue+"\n"
     }
     messages+=emails+"\n" //putting the email values in messages to simplify search
-    console.log(messages)
     await page.waitForSelector("#header > h1") //title of ticket
     let ticketTitleElement = await page.$("#header > h1");
     let ticketTitleValue = await page.evaluate(el => el.textContent, ticketTitleElement);
@@ -205,7 +201,7 @@ async function ticketFix(page : Page) : Promise<void> {
 
         //maybe score it??? +1 point for each regex hit, -1 point for each NOhit? BUT there can b mult tags...tricky
 
-        //i means case insensitive BTW sometimes spaces/linebreaks dont go into messages string, so you have things like "Hello Eryn,We are" etc. make sure the regex is fine w that TODO actually just fucking fix this, it's nice to b able to use \b word boundaries.
+        //i means case insensitive
         const googleDriveRegexList = [/google drive/i, /drive request/i]
         const NOgoogleDriveRegexList = []
         const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i]
@@ -216,7 +212,7 @@ async function ticketFix(page : Page) : Promise<void> {
         const NOlibraryRelatedRegexList = []
         const massEmailRegexList = [/release email/i, /groups.reed.edu admins: Message Pending/]
         const NOmassEmailRegexList = []
-        const microsoftRegexList = [/microsoft/i, /powerpoint/i, /excel/i, /Word/, /macro/i, /Office/, /.doc\b/, /.docx\b/, /ppt\b/,/pptx\b/, /csv/, /.xl/]
+        const microsoftRegexList = [/microsoft/i, /powerpoint/i, /excel/i, /Word/, /macro/i, /.doc\b/, /.docx\b/, /ppt\b/,/pptx\b/, /csv/, /.xl/] //got rid of /Office/ cuz Office of the Registrar etc can be in signatures
         const NOmicrosoftRegexList = [/template/i] //word thesis template issues are NOT microsoft tag
         const networkRegexList = [/wifi/i,/ethernet/i,/connection issue/i,/reed1x/i,/fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i,/trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i] ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
         const NOnetworkRegexList = [/groups.reed.edu/]
@@ -226,7 +222,7 @@ async function ticketFix(page : Page) : Promise<void> {
         const NOphishRegexList = []
         const printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i]
         const NOprintingRegexList = []
-        const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/]
+        const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/]
         const NOreedAccountsRegexList = []
         const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /vlc/i, /quicktime/i, /zotero/i, /latex/i, /driver/i, /stata/i, /filemaker/i, /vmware/i]
         const NOsoftwareRegexList = []
@@ -291,31 +287,82 @@ async function ticketFix(page : Page) : Promise<void> {
 
 
     //PAGE CHANGE
+    let currURL:string = page.url();
+    //replace Display with Modify
+    let modifyURL:string = currURL.replace('Display', 'Modify');
+    await page.goto(modifyURL);
 
-    // let currURL:string = page.url();
-    // //replace Display with Modify
-    // let modifyURL:string = currURL.replace('Display', 'Modify');
-    // await page.goto(modifyURL);
-    //
-    // //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
-    //
-    // //TODO remember (for older tickets especially) the requestor affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
-    //
-    // console.log("Current Ticket: "+page.url())
-    //
-    // const googleDriveCheckbox = await page.$(`input[value="google drive"]`);
-    // const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue();
-    // if(googleDrive!=googleDriveChecked){console.log("Algo Google Drive: "+googleDrive+ "Ticket Google Drive: "+googleDriveChecked)}
-    //
-    // const googleGroupCheckbox = await page.$(`input[value="google group"]`);
-    // const googleGroupChecked = await (await googleGroupCheckbox.getProperty('checked')).jsonValue();
-    // if(googleGroup!=googleGroupChecked){console.log("Algo Google Group: "+googleGroup+ "Ticket Google Group: "+googleGroupChecked)}
-    //
-    // const hardwareCheckbox = await page.$(`input[value="hardware"]`);
-    // const hardwareChecked = await (await hardwareCheckbox.getProperty('checked')).jsonValue();
-    // if(hardware!=hardwareChecked){console.log("Algo Hardware: "+hardware+ "Ticket Hardware: "+hardwareChecked)}
+    //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
 
+    //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
 
+    console.log("Current Ticket: "+page.url())
+
+    const googleDriveCheckbox = await page.$(`input[value="google drive"]`);
+    const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue();
+    if(googleDrive!=googleDriveChecked){console.log("Algo Google Drive: "+googleDrive+ "Ticket Google Drive: "+googleDriveChecked)}
+
+    const googleGroupCheckbox = await page.$(`input[value="google group"]`);
+    const googleGroupChecked = await (await googleGroupCheckbox.getProperty('checked')).jsonValue();
+    if(googleGroup!=googleGroupChecked){console.log("Algo Google Group: "+googleGroup+ "Ticket Google Group: "+googleGroupChecked)}
+
+    const hardwareCheckbox = await page.$(`input[value="hardware"]`);
+    const hardwareChecked = await (await hardwareCheckbox.getProperty('checked')).jsonValue();
+    if(hardware!=hardwareChecked){console.log("Algo Hardware: "+hardware+ "Ticket Hardware: "+hardwareChecked)}
+
+    const libraryRelatedCheckbox = await page.$(`input[value="library related"]`);
+    const libraryRelatedChecked = await (await libraryRelatedCheckbox.getProperty('checked')).jsonValue();
+    if(libraryRelated!=libraryRelatedChecked){console.log("Algo LibraryRelated: "+libraryRelated+ "Ticket LibraryRelated: "+libraryRelatedChecked)}
+
+    const massEmailCheckbox = await page.$(`input[value="mass email"]`);
+    const massEmailChecked = await (await massEmailCheckbox.getProperty('checked')).jsonValue();
+    if(massEmail!=massEmailChecked){console.log("Algo massEmail: "+massEmail+ "Ticket massEmail: "+massEmailChecked)}
+
+    const microsoftCheckbox = await page.$(`input[value="microsoft"]`);
+    const microsoftChecked = await (await microsoftCheckbox.getProperty('checked')).jsonValue();
+    if(microsoft!=microsoftChecked){console.log("Algo microsoft: "+microsoft+ "Ticket microsoft: "+microsoftChecked)}
+
+    const networkCheckbox = await page.$(`input[value="network"]`);
+    const networkChecked = await (await networkCheckbox.getProperty('checked')).jsonValue();
+    if(network!=networkChecked){console.log("Algo network: "+network+ "Ticket network: "+networkChecked)}
+
+    const passwordResetCheckbox = await page.$(`input[value="password reset"]`);
+    const passwordResetChecked = await (await passwordResetCheckbox.getProperty('checked')).jsonValue();
+    if(passwordReset!=passwordResetChecked){console.log("Algo passwordReset: "+passwordReset+ "Ticket passwordReset: "+passwordResetChecked)}
+
+    const phishCheckbox = await page.$(`input[value="phish report/fwd"]`);
+    const phishChecked = await (await phishCheckbox.getProperty('checked')).jsonValue();
+    if(phish!=phishChecked){console.log("Algo phish: "+phish+ "Ticket phish: "+phishChecked)}
+
+    const printingCheckbox = await page.$(`input[value="printers/copiers"]`);
+    const printingChecked = await (await printingCheckbox.getProperty('checked')).jsonValue();
+    if(printing!=printingChecked){console.log("Algo printing: "+printing+ "Ticket printing: "+printingChecked)}
+
+    const reedAccountsCheckbox = await page.$(`input[value="reed accounts & access"]`);
+    const reedAccountsChecked = await (await reedAccountsCheckbox.getProperty('checked')).jsonValue();
+    if(reedAccounts!=reedAccountsChecked){console.log("Algo reedAccounts: "+reedAccounts+ "Ticket reedAccounts: "+reedAccountsChecked)}
+
+    const softwareCheckbox = await page.$(`input[value="software"]`);
+    const softwareChecked = await (await softwareCheckbox.getProperty('checked')).jsonValue();
+    if(software!=softwareChecked){console.log("Algo software: "+software+ "Ticket software: "+softwareChecked)}
+
+    const thesisCheckbox = await page.$(`input[value="thesis"]`);
+    const thesisChecked = await (await thesisCheckbox.getProperty('checked')).jsonValue();
+    if(thesis!=thesisChecked){console.log("Algo thesis: "+thesis+ "Ticket thesis: "+thesisChecked)}
+
+    const twoFactorCheckbox = await page.$(`input[value="two-factor"]`);
+    const twoFactorChecked = await (await twoFactorCheckbox.getProperty('checked')).jsonValue();
+    if(twoFactor!=twoFactorChecked){console.log("Algo twoFactor: "+twoFactor+ "Ticket twoFactor: "+twoFactorChecked)}
+
+    const nameChangeCheckbox = await page.$(`input[value="user/name change"]`);
+    const nameChangeChecked = await (await nameChangeCheckbox.getProperty('checked')).jsonValue();
+    if(nameChange!=nameChangeChecked){console.log("Algo nameChange: "+nameChange+ "Ticket nameChange: "+nameChangeChecked)}
+
+    const virusMalwareCheckbox = await page.$(`input[value="virus/malware"]`);
+    const virusMalwareChecked = await (await virusMalwareCheckbox.getProperty('checked')).jsonValue();
+    if(virusMalware!=virusMalwareChecked){console.log("Algo virusMalware: "+virusMalware+ "Ticket virusMalware: "+virusMalwareChecked)}
+
+    //TODO also the affiliation stuff! check how the prospie logic works again. or maybe dont test it for now tbh, one thing at a time
 
 
 
