@@ -60,7 +60,7 @@ async function ticketFix(page : Page) : Promise<void> {
         }
 
     }
-    console.log("Emeritus: "+emeritus);
+    //console.log("Emeritus: "+emeritus);
 
     //AFFILIATIONS SECTION
     //const affiliationSelector = `.CustomField__Secondary_Affiliations_ > span.value`;
@@ -99,11 +99,11 @@ async function ticketFix(page : Page) : Promise<void> {
         }
 
     }
-    console.log("Faculty: "+faculty);
-    console.log("Student: "+student);
-    console.log("Affiliate: "+affiliate);
-    console.log("Alumni: "+alumni);
-    console.log("Staff: "+staff);
+    // console.log("Faculty: "+faculty);
+    // console.log("Student: "+student);
+    // console.log("Affiliate: "+affiliate);
+    // console.log("Alumni: "+alumni);
+    // console.log("Staff: "+staff);
     //TODO let possibleApplicant: boolean
 
     //EMAIL CHECK SECTION
@@ -161,9 +161,9 @@ async function ticketFix(page : Page) : Promise<void> {
 
     if (emails.includes("malwarebytes.com")){virusMalware=true}
     else if(emails.includes("crowdstrike")){virusMalware=true}
-    else if(emails.includes("etrieve@reed.edu")){}//no tag, this is the "Notification of Staff Hire" emails
+    else if(emails.includes("etrieve@reed.edu")){noTag=true}//no tag, this is the "Notification of Staff Hire" emails
     else if(ticketTitleValue.includes("Welcome to Reed College | Notes for your first day of work")){}//no tag https://help.reed.edu/Ticket/Display.html?id=347871
-    else if(ticketTitleValue.includes("Welcome to Reed College")){}//no tag
+    else if(ticketTitleValue.includes("Welcome to Reed College")){noTag=true}//no tag
     else if(emails.includes("msgappr@groups.reed.edu")||ticketTitleValue.includes("groups.reed.edu admins: Message Pending")){massEmail=true}
     else if(ticketTitleValue.includes("Shared Drive Request")){googleDrive=true}
     else if(ticketTitleValue.includes("Google Group Request")){googleGroup=true}
@@ -271,26 +271,51 @@ async function ticketFix(page : Page) : Promise<void> {
         if(twoFactorMatch){twoFactor=true}
         if(nameChangeMatch){nameChange=true}
         if(virusMalwareMatch){virusMalware=true}
-        if(noTagMatch){noTag=true} //currently not using, but idk might come in handy(:
+        if(noTagMatch){noTag=true}
 
+        //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
+        if(!googleDriveMatch&&!googleGroupMatch&&!hardwareMatch&&!libraryRelatedMatch&&!massEmailMatch&&!microsoftMatch&&!networkMatch&&!passwordResetMatch&&!phishMatch&&!printingMatch&&!reedAccountsMatch&&!softwareMatch&&!thesisMatch&&!twoFactorMatch&&!nameChangeMatch&&!virusMalwareMatch&&!noTagMatch){console.log("FLAG NO REGEX MATCH "+page.url())}
 
-        //TODO if no matches, flag for review
-
-
-        //TODO if noTag or noTagMatch, nothing tagged
     }//end of else regex section
 
 
 
 
-    //temporarily off as i figure out regexing tickethistory
+
     //PAGE CHANGE
 
-    // let currURL:string = page.url();
-    // //replace Display with Modify
-    // let modifyURL:string = currURL.replace('Display', 'Modify');
-    // //TODO check if there are prexisting checkboxes checked!!!!!
-    // await page.goto(modifyURL);
+    let currURL:string = page.url();
+    //replace Display with Modify
+    let modifyURL:string = currURL.replace('Display', 'Modify');
+    await page.goto(modifyURL);
+
+    //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
+
+    console.log("Current Ticket: "+page.url())
+
+    const googleDriveCheckbox = await page.$(`input[value="google drive"]`);
+    const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue();
+    if(googleDrive!=googleDriveChecked){console.log("Algo Google Drive: "+googleDrive+ "Ticket Google Drive: "+googleDriveChecked)}
+
+    const googleGroupCheckbox = await page.$(`input[value="google group"]`);
+    const googleGroupChecked = await (await googleGroupCheckbox.getProperty('checked')).jsonValue();
+    if(googleGroup!=googleGroupChecked){console.log("Algo Google Group: "+googleGroup+ "Ticket Google Group: "+googleGroupChecked)}
+
+    const hardwareCheckbox = await page.$(`input[value="hardware"]`);
+    const hardwareChecked = await (await hardwareCheckbox.getProperty('checked')).jsonValue();
+    if(hardware!=hardwareChecked){console.log("Algo Hardware: "+hardware+ "Ticket Hardware: "+hardwareChecked)}
+
+
+
+
+
+
+
+
+
+
+
+
     //
     // if (emeritus){
     //     if (faculty){checkSpecificBox(page,"emeritus/emerita");checkSpecificBox(page,"faculty");}

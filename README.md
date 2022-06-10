@@ -2,6 +2,10 @@
 This will only go as far back at Aug '21 at most (ergo two-factor tags are potentially valid for every ticket etc)
 
 ### todo
+maybe tweak applicant/prospie flag logic?
+
+Can cycle thru tickets by just using the ticket number! don't have to click links or anything. best way.
+
 finish up last remaining tags and write the comparison code to see where this program diverges from actually tagged tix. don't actually change any tix; but look at al prev tagged tix
 
 currently finding hard rules and looser regex, currently on software. pull up all tickets in both twatch and cus queue for that tag to understand it, also look at the criteria in the md file from the taylor writeup

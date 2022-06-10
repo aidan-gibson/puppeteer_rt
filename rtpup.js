@@ -109,7 +109,7 @@ function checkSpecificBox(page, checkBoxSelector) {
 function ticketFix(page) {
     var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
     return __awaiter(this, void 0, void 0, function () {
-        var titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveRegexList, NOgoogleDriveRegexList, googleGroupRegexList, NOgoogleGroupRegexList, hardwareRegexList, NOhardwareRegexList, libraryRelatedRegexList, NOlibraryRelatedRegexList, massEmailRegexList, NOmassEmailRegexList, microsoftRegexList, NOmicrosoftRegexList, networkRegexList, NOnetworkRegexList, passwordResetRegexList, NOpasswordResetRegexList, phishRegexList, NOphishRegexList, printingRegexList, NOprintingRegexList, reedAccountsRegexList, NOreedAccountsRegexList, softwareRegexList, NOsoftwareRegexList, thesisRegexList, NOthesisRegexList, twoFactorRegexList, NOtwoFactorRegexList, nameChangeRegexList, NOnameChangeRegexList, virusMalwareRegexList, NOvirusMalwareRegexList, noTagRegexList, NOnoTagRegexList, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch;
+        var titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveRegexList, NOgoogleDriveRegexList, googleGroupRegexList, NOgoogleGroupRegexList, hardwareRegexList, NOhardwareRegexList, libraryRelatedRegexList, NOlibraryRelatedRegexList, massEmailRegexList, NOmassEmailRegexList, microsoftRegexList, NOmicrosoftRegexList, networkRegexList, NOnetworkRegexList, passwordResetRegexList, NOpasswordResetRegexList, phishRegexList, NOphishRegexList, printingRegexList, NOprintingRegexList, reedAccountsRegexList, NOreedAccountsRegexList, softwareRegexList, NOsoftwareRegexList, thesisRegexList, NOthesisRegexList, twoFactorRegexList, NOtwoFactorRegexList, nameChangeRegexList, NOnameChangeRegexList, virusMalwareRegexList, NOvirusMalwareRegexList, noTagRegexList, NOnoTagRegexList, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, googleDriveCheckbox, googleDriveChecked, googleGroupCheckbox, googleGroupChecked, hardwareCheckbox, hardwareChecked;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -156,7 +156,6 @@ function ticketFix(page) {
                     return [7 /*endfinally*/];
                 case 14: return [7 /*endfinally*/];
                 case 15:
-                    console.log("Emeritus: " + emeritus);
                     affiliationSelector = ".CustomField__Primary_Affiliation_ > span.value";
                     faculty = false;
                     student = false;
@@ -216,11 +215,6 @@ function ticketFix(page) {
                     return [7 /*endfinally*/];
                 case 28: return [7 /*endfinally*/];
                 case 29:
-                    console.log("Faculty: " + faculty);
-                    console.log("Student: " + student);
-                    console.log("Affiliate: " + affiliate);
-                    console.log("Alumni: " + alumni);
-                    console.log("Staff: " + staff);
                     nonReedEmail = false;
                     emailSelector = ".EmailAddress > span.value";
                     return [4 /*yield*/, page.$$(emailSelector)];
@@ -343,9 +337,13 @@ function ticketFix(page) {
                     else if (emails.includes("crowdstrike")) {
                         virusMalware = true;
                     }
-                    else if (emails.includes("etrieve@reed.edu")) { } //no tag, this is the "Notification of Staff Hire" emails
+                    else if (emails.includes("etrieve@reed.edu")) {
+                        noTag = true;
+                    } //no tag, this is the "Notification of Staff Hire" emails
                     else if (ticketTitleValue.includes("Welcome to Reed College | Notes for your first day of work")) { } //no tag https://help.reed.edu/Ticket/Display.html?id=347871
-                    else if (ticketTitleValue.includes("Welcome to Reed College")) { } //no tag
+                    else if (ticketTitleValue.includes("Welcome to Reed College")) {
+                        noTag = true;
+                    } //no tag
                     else if (emails.includes("msgappr@groups.reed.edu") || ticketTitleValue.includes("groups.reed.edu admins: Message Pending")) {
                         massEmail = true;
                     }
@@ -517,10 +515,49 @@ function ticketFix(page) {
                         }
                         if (noTagMatch) {
                             noTag = true;
-                        } //currently not using, but idk might come in handy(:
-                        //TODO if no matches, flag for review
-                        //TODO if noTag or noTagMatch, nothing tagged
+                        }
+                        //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
+                        if (!googleDriveMatch && !googleGroupMatch && !hardwareMatch && !libraryRelatedMatch && !massEmailMatch && !microsoftMatch && !networkMatch && !passwordResetMatch && !phishMatch && !printingMatch && !reedAccountsMatch && !softwareMatch && !thesisMatch && !twoFactorMatch && !nameChangeMatch && !virusMalwareMatch && !noTagMatch) {
+                            console.log("FLAG NO REGEX MATCH " + page.url());
+                        }
                     } //end of else regex section
+                    currURL = page.url();
+                    modifyURL = currURL.replace('Display', 'Modify');
+                    return [4 /*yield*/, page.goto(modifyURL)];
+                case 62:
+                    _e.sent();
+                    //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
+                    console.log("Current Ticket: " + page.url());
+                    return [4 /*yield*/, page.$("input[value=\"google drive\"]")];
+                case 63:
+                    googleDriveCheckbox = _e.sent();
+                    return [4 /*yield*/, googleDriveCheckbox.getProperty('checked')];
+                case 64: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 65:
+                    googleDriveChecked = _e.sent();
+                    if (googleDrive != googleDriveChecked) {
+                        console.log("Algo Google Drive: " + googleDrive + "Ticket Google Drive: " + googleDriveChecked);
+                    }
+                    return [4 /*yield*/, page.$("input[value=\"google group\"]")];
+                case 66:
+                    googleGroupCheckbox = _e.sent();
+                    return [4 /*yield*/, googleGroupCheckbox.getProperty('checked')];
+                case 67: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 68:
+                    googleGroupChecked = _e.sent();
+                    if (googleGroup != googleGroupChecked) {
+                        console.log("Algo Google Group: " + googleGroup + "Ticket Google Group: " + googleGroupChecked);
+                    }
+                    return [4 /*yield*/, page.$("input[value=\"hardware\"]")];
+                case 69:
+                    hardwareCheckbox = _e.sent();
+                    return [4 /*yield*/, hardwareCheckbox.getProperty('checked')];
+                case 70: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 71:
+                    hardwareChecked = _e.sent();
+                    if (hardware != hardwareChecked) {
+                        console.log("Algo Hardware: " + hardware + "Ticket Hardware: " + hardwareChecked);
+                    }
                     return [2 /*return*/];
             }
         });
