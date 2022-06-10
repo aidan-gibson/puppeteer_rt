@@ -48,8 +48,43 @@ var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = "aigibson";
 var reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 var ticketURL = "https://help.reed.edu/Ticket/Display.html?id=";
-var currentTicket = 346157;
+var currentTicket = 336611;
 var puppeteer = require('puppeteer');
+//i means case insensitive
+var googleDriveRegexList = [/google drive/i, /drive request/i];
+var NOgoogleDriveRegexList = [];
+var googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i];
+var NOgoogleGroupRegexList = [];
+var hardwareRegexList = [];
+var NOhardwareRegexList = [];
+var libraryRelatedRegexList = [/e-book/i, /library/i, /librarian/i, /IMC/, /LangLab/i];
+var NOlibraryRelatedRegexList = [];
+var massEmailRegexList = [/release email/i, /groups.reed.edu admins: Message Pending/, /mass email/i];
+var NOmassEmailRegexList = [];
+var microsoftRegexList = [/microsoft/i, /powerpoint/i, /excel/i, /Word/, /macro/i, /.doc\b/, /.docx\b/, /ppt\b/, /pptx\b/, /csv/, /.xl/]; //got rid of /Office/ cuz Office of the Registrar etc can be in signatures
+var NOmicrosoftRegexList = [/template/i]; //word thesis template issues are NOT microsoft tag
+var networkRegexList = [/wifi/i, /ethernet/i, /connection issue/i, /reed1x/i, /fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i, /trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i]; ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
+var NOnetworkRegexList = [/groups.reed.edu/];
+var passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/]; //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
+var NOpasswordResetRegexList = [];
+var phishRegexList = [/phish/i, /scam/i, /spam/i];
+var NOphishRegexList = [];
+var printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i];
+var NOprintingRegexList = [];
+var reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/];
+var NOreedAccountsRegexList = [];
+var softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i]; //removed /\bdriver\b/i
+var NOsoftwareRegexList = [];
+var thesisRegexList = [/thesis/i]; //[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
+var NOthesisRegexList = [];
+var twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i, /hardware token/i];
+var NOtwoFactorRegexList = [];
+var nameChangeRegexList = [/name change/i, /change name/i];
+var NOnameChangeRegexList = [];
+var virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,];
+var NOvirusMalwareRegexList = [];
+var noTagRegexList = [];
+var NOnoTagRegexList = [];
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var browser, page;
@@ -66,9 +101,9 @@ function run() {
                     return [4 /*yield*/, browser.pages()];
                 case 2:
                     page = (_a.sent())[0];
-                    return [4 /*yield*/, page.setViewport({ width: 850, height: 800 })];
+                    return [4 /*yield*/, page.setViewport({ width: 1692, height: 777 })];
                 case 3:
-                    _a.sent(); //doesn't matter
+                    _a.sent(); //({ width: 850, height: 800}); //doesn't matter
                     return [4 /*yield*/, page.goto(reedLoginURL + ticketURL + currentTicket)];
                 case 4:
                     _a.sent();
@@ -110,7 +145,7 @@ function checkSpecificBox(page, checkBoxSelector) {
 function ticketFix(page) {
     var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
     return __awaiter(this, void 0, void 0, function () {
-        var quotedTextSelector, titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveRegexList, NOgoogleDriveRegexList, googleGroupRegexList, NOgoogleGroupRegexList, hardwareRegexList, NOhardwareRegexList, libraryRelatedRegexList, NOlibraryRelatedRegexList, massEmailRegexList, NOmassEmailRegexList, microsoftRegexList, NOmicrosoftRegexList, networkRegexList, NOnetworkRegexList, passwordResetRegexList, NOpasswordResetRegexList, phishRegexList, NOphishRegexList, printingRegexList, NOprintingRegexList, reedAccountsRegexList, NOreedAccountsRegexList, softwareRegexList, NOsoftwareRegexList, thesisRegexList, NOthesisRegexList, twoFactorRegexList, NOtwoFactorRegexList, nameChangeRegexList, NOnameChangeRegexList, virusMalwareRegexList, NOvirusMalwareRegexList, noTagRegexList, NOnoTagRegexList, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, googleDriveCheckbox, googleDriveChecked, googleGroupCheckbox, googleGroupChecked, hardwareCheckbox, hardwareChecked, libraryRelatedCheckbox, libraryRelatedChecked, massEmailCheckbox, massEmailChecked, microsoftCheckbox, microsoftChecked, networkCheckbox, networkChecked, passwordResetCheckbox, passwordResetChecked, phishCheckbox, phishChecked, printingCheckbox, printingChecked, reedAccountsCheckbox, reedAccountsChecked, softwareCheckbox, softwareChecked, thesisCheckbox, thesisChecked, twoFactorCheckbox, twoFactorChecked, nameChangeCheckbox, nameChangeChecked, virusMalwareCheckbox, virusMalwareChecked;
+        var quotedTextSelector, titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, googleDriveCheckbox, googleDriveChecked, googleGroupCheckbox, googleGroupChecked, hardwareCheckbox, hardwareChecked, libraryRelatedCheckbox, libraryRelatedChecked, massEmailCheckbox, massEmailChecked, microsoftCheckbox, microsoftChecked, networkCheckbox, networkChecked, passwordResetCheckbox, passwordResetChecked, phishCheckbox, phishChecked, printingCheckbox, printingChecked, reedAccountsCheckbox, reedAccountsChecked, softwareCheckbox, softwareChecked, i, thesisCheckbox, thesisChecked, twoFactorCheckbox, twoFactorChecked, nameChangeCheckbox, nameChangeChecked, virusMalwareCheckbox, virusMalwareChecked;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -417,45 +452,6 @@ function ticketFix(page) {
                         twoFactor = true;
                     }
                     else {
-                        googleDriveRegexList = [/google drive/i, /drive request/i];
-                        NOgoogleDriveRegexList = [];
-                        googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i];
-                        NOgoogleGroupRegexList = [];
-                        hardwareRegexList = [];
-                        NOhardwareRegexList = [];
-                        libraryRelatedRegexList = [/e-book/i, /library/i, /librarian/i, /IMC/, /LangLab/i];
-                        NOlibraryRelatedRegexList = [];
-                        massEmailRegexList = [/release email/i, /groups.reed.edu admins: Message Pending/];
-                        NOmassEmailRegexList = [];
-                        microsoftRegexList = [/microsoft/i, /powerpoint/i, /excel/i, /Word/, /macro/i, /.doc\b/, /.docx\b/, /ppt\b/, /pptx\b/, /csv/, /.xl/] //got rid of /Office/ cuz Office of the Registrar etc can be in signatures
-                        ;
-                        NOmicrosoftRegexList = [/template/i] //word thesis template issues are NOT microsoft tag
-                        ;
-                        networkRegexList = [/wifi/i, /ethernet/i, /connection issue/i, /reed1x/i, /fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i, /trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i] ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
-                        ;
-                        NOnetworkRegexList = [/groups.reed.edu/];
-                        passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/] //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
-                        ;
-                        NOpasswordResetRegexList = [];
-                        phishRegexList = [/phish/i, /scam/i, /spam/i];
-                        NOphishRegexList = [];
-                        printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i];
-                        NOprintingRegexList = [];
-                        reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/];
-                        NOreedAccountsRegexList = [];
-                        softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /vlc/i, /quicktime/i, /zotero/i, /latex/i, /driver/i, /stata/i, /filemaker/i, /vmware/i];
-                        NOsoftwareRegexList = [];
-                        thesisRegexList = [/thesis/i] //[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
-                        ;
-                        NOthesisRegexList = [];
-                        twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i, /hardware token/i];
-                        NOtwoFactorRegexList = [];
-                        nameChangeRegexList = [/name change/i, /change name/i];
-                        NOnameChangeRegexList = [];
-                        virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,];
-                        NOvirusMalwareRegexList = [];
-                        noTagRegexList = [];
-                        NOnoTagRegexList = [];
                         googleDriveMatch = googleDriveRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleDriveRegexList.some(function (rx) { return rx.test(messages); })));
                         googleGroupMatch = googleGroupRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleGroupRegexList.some(function (rx) { return rx.test(messages); })));
                         hardwareMatch = hardwareRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOhardwareRegexList.some(function (rx) { return rx.test(messages); })));
@@ -496,9 +492,6 @@ function ticketFix(page) {
                         if (networkMatch) {
                             network = true;
                         }
-                        if (passwordResetMatch) {
-                            passwordReset = true;
-                        }
                         if (phishMatch) {
                             phish = true;
                         }
@@ -511,10 +504,6 @@ function ticketFix(page) {
                         if (softwareMatch) {
                             software = true;
                         }
-                        if (thesisMatch) {
-                            thesis = true;
-                            microsoft = false;
-                        } //if thesis, NOT microsoft, always
                         if (twoFactorMatch) {
                             twoFactor = true;
                         }
@@ -527,6 +516,15 @@ function ticketFix(page) {
                         if (noTagMatch) {
                             noTag = true;
                         }
+                        //keep these exceptions at bottom
+                        if (passwordResetMatch) {
+                            passwordReset = true;
+                            reedAccounts = false;
+                        } //if password reset, NOT reed account, always
+                        if (thesisMatch) {
+                            thesis = true;
+                            microsoft = false;
+                        } //if thesis, NOT microsoft, always
                         //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
                         if (!googleDriveMatch && !googleGroupMatch && !hardwareMatch && !libraryRelatedMatch && !massEmailMatch && !microsoftMatch && !networkMatch && !passwordResetMatch && !phishMatch && !printingMatch && !reedAccountsMatch && !softwareMatch && !thesisMatch && !twoFactorMatch && !nameChangeMatch && !virusMalwareMatch && !noTagMatch) {
                             console.log("FLAG NO REGEX MATCH " + page.url());
@@ -659,6 +657,9 @@ function ticketFix(page) {
                     softwareChecked = _e.sent();
                     if (software != softwareChecked) {
                         console.log("Algo software: " + software + "Ticket software: " + softwareChecked);
+                        for (i = 0; i < softwareRegexList.length; i++) {
+                            console.log(softwareRegexList[i].exec(messages));
+                        }
                     }
                     return [4 /*yield*/, page.$("input[value=\"thesis\"]")];
                 case 101:

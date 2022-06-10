@@ -4,9 +4,44 @@ const pw = readFileSync('./password.txt','utf-8')
 const login = "aigibson";
 const reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
 const ticketURL = "https://help.reed.edu/Ticket/Display.html?id="
-let currentTicket = 346157
+let currentTicket = 336611
 const puppeteer = require('puppeteer');
 
+//i means case insensitive
+const googleDriveRegexList = [/google drive/i, /drive request/i]
+const NOgoogleDriveRegexList = []
+const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i]
+const NOgoogleGroupRegexList = []
+const hardwareRegexList = []
+const NOhardwareRegexList = []
+const libraryRelatedRegexList = [/e-book/i,/library/i, /librarian/i, /IMC/, /LangLab/i]
+const NOlibraryRelatedRegexList = []
+const massEmailRegexList = [/release email/i, /groups.reed.edu admins: Message Pending/, /mass email/i]
+const NOmassEmailRegexList = []
+const microsoftRegexList = [/microsoft/i, /powerpoint/i, /excel/i, /Word/, /macro/i, /.doc\b/, /.docx\b/, /ppt\b/,/pptx\b/, /csv/, /.xl/] //got rid of /Office/ cuz Office of the Registrar etc can be in signatures
+const NOmicrosoftRegexList = [/template/i] //word thesis template issues are NOT microsoft tag
+const networkRegexList = [/wifi/i,/ethernet/i,/connection issue/i,/reed1x/i,/fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i,/trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i] ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
+const NOnetworkRegexList = [/groups.reed.edu/]
+const passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/] //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
+const NOpasswordResetRegexList = []
+const phishRegexList = [/phish/i, /scam/i, /spam/i]
+const NOphishRegexList = []
+const printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i]
+const NOprintingRegexList = []
+const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/]
+const NOreedAccountsRegexList = []
+const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i] //removed /\bdriver\b/i
+const NOsoftwareRegexList = []
+const thesisRegexList = [/thesis/i]//[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
+const NOthesisRegexList = []
+const twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i, /hardware token/i]
+const NOtwoFactorRegexList = []
+const nameChangeRegexList = [/name change/i, /change name/i]
+const NOnameChangeRegexList = []
+const virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,]
+const NOvirusMalwareRegexList = []
+const noTagRegexList = []
+const NOnoTagRegexList = []
 
 async function run() {
     const browser = await puppeteer.launch({
@@ -15,7 +50,7 @@ async function run() {
                                            })
     //const page = await browser.newPage()
     const [page] = await browser.pages(); //this fixes extra empty tab being open instead of above line
-    await page.setViewport({ width: 850, height: 800}); //doesn't matter
+    await page.setViewport({ width: 1692, height: 777});//({ width: 850, height: 800}); //doesn't matter
     await page.goto(reedLoginURL+ticketURL+currentTicket)
     await page.type('[name="login"]', login)
     await page.type('[name="password"]', pw)
@@ -197,45 +232,11 @@ async function ticketFix(page : Page) : Promise<void> {
 
 
     else {
-        //regex section, only run if no hard rules found
+        //regex section, only run if no hard rules found (moved regex lists outside of fnc to b global
 
         //maybe score it??? +1 point for each regex hit, -1 point for each NOhit? BUT there can b mult tags...tricky
 
-        //i means case insensitive
-        const googleDriveRegexList = [/google drive/i, /drive request/i]
-        const NOgoogleDriveRegexList = []
-        const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i]
-        const NOgoogleGroupRegexList = []
-        const hardwareRegexList = []
-        const NOhardwareRegexList = []
-        const libraryRelatedRegexList = [/e-book/i,/library/i, /librarian/i, /IMC/, /LangLab/i]
-        const NOlibraryRelatedRegexList = []
-        const massEmailRegexList = [/release email/i, /groups.reed.edu admins: Message Pending/]
-        const NOmassEmailRegexList = []
-        const microsoftRegexList = [/microsoft/i, /powerpoint/i, /excel/i, /Word/, /macro/i, /.doc\b/, /.docx\b/, /ppt\b/,/pptx\b/, /csv/, /.xl/] //got rid of /Office/ cuz Office of the Registrar etc can be in signatures
-        const NOmicrosoftRegexList = [/template/i] //word thesis template issues are NOT microsoft tag
-        const networkRegexList = [/wifi/i,/ethernet/i,/connection issue/i,/reed1x/i,/fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i,/trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i] ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
-        const NOnetworkRegexList = [/groups.reed.edu/]
-        const passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/] //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
-        const NOpasswordResetRegexList = []
-        const phishRegexList = [/phish/i, /scam/i, /spam/i]
-        const NOphishRegexList = []
-        const printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i]
-        const NOprintingRegexList = []
-        const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/]
-        const NOreedAccountsRegexList = []
-        const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /vlc/i, /quicktime/i, /zotero/i, /latex/i, /driver/i, /stata/i, /filemaker/i, /vmware/i]
-        const NOsoftwareRegexList = []
-        const thesisRegexList = [/thesis/i]//[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
-        const NOthesisRegexList = []
-        const twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i, /hardware token/i]
-        const NOtwoFactorRegexList = []
-        const nameChangeRegexList = [/name change/i, /change name/i]
-        const NOnameChangeRegexList = []
-        const virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,]
-        const NOvirusMalwareRegexList = []
-        const noTagRegexList = []
-        const NOnoTagRegexList = []
+
 
 
         const googleDriveMatch = googleDriveRegexList.some(rx => rx.test(messages)) && (!(NOgoogleDriveRegexList.some(rx => rx.test(messages))))
@@ -266,16 +267,18 @@ async function ticketFix(page : Page) : Promise<void> {
         if(massEmailMatch){massEmail=true}
         if(microsoftMatch){microsoft=true}
         if(networkMatch){network=true}
-        if(passwordResetMatch){passwordReset=true}
         if(phishMatch){phish=true}
         if(printingMatch){printing=true}
         if(reedAccountsMatch){reedAccounts=true}
         if(softwareMatch){software=true}
-        if(thesisMatch){thesis=true; microsoft=false} //if thesis, NOT microsoft, always
         if(twoFactorMatch){twoFactor=true}
         if(nameChangeMatch){nameChange=true}
         if(virusMalwareMatch){virusMalware=true}
         if(noTagMatch){noTag=true}
+
+        //keep these exceptions at bottom
+        if(passwordResetMatch){passwordReset=true;reedAccounts=false} //if password reset, NOT reed account, always
+        if(thesisMatch){thesis=true; microsoft=false} //if thesis, NOT microsoft, always
 
         //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
         if(!googleDriveMatch&&!googleGroupMatch&&!hardwareMatch&&!libraryRelatedMatch&&!massEmailMatch&&!microsoftMatch&&!networkMatch&&!passwordResetMatch&&!phishMatch&&!printingMatch&&!reedAccountsMatch&&!softwareMatch&&!thesisMatch&&!twoFactorMatch&&!nameChangeMatch&&!virusMalwareMatch&&!noTagMatch){console.log("FLAG NO REGEX MATCH "+page.url())}
@@ -328,7 +331,11 @@ async function ticketFix(page : Page) : Promise<void> {
 
     const passwordResetCheckbox = await page.$(`input[value="password reset"]`);
     const passwordResetChecked = await (await passwordResetCheckbox.getProperty('checked')).jsonValue();
-    if(passwordReset!=passwordResetChecked){console.log("Algo passwordReset: "+passwordReset+ "Ticket passwordReset: "+passwordResetChecked)}
+    if(passwordReset!=passwordResetChecked){
+        console.log("Algo passwordReset: "+passwordReset+ "Ticket passwordReset: "+passwordResetChecked)
+
+    }
+
 
     const phishCheckbox = await page.$(`input[value="phish report/fwd"]`);
     const phishChecked = await (await phishCheckbox.getProperty('checked')).jsonValue();
@@ -344,7 +351,12 @@ async function ticketFix(page : Page) : Promise<void> {
 
     const softwareCheckbox = await page.$(`input[value="software"]`);
     const softwareChecked = await (await softwareCheckbox.getProperty('checked')).jsonValue();
-    if(software!=softwareChecked){console.log("Algo software: "+software+ "Ticket software: "+softwareChecked)}
+    if(software!=softwareChecked){
+        console.log("Algo software: "+software+ "Ticket software: "+softwareChecked)
+        for(let i=0;i<softwareRegexList.length;i++) {
+            console.log(softwareRegexList[i].exec(messages))
+        }
+    }
 
     const thesisCheckbox = await page.$(`input[value="thesis"]`);
     const thesisChecked = await (await thesisCheckbox.getProperty('checked')).jsonValue();
