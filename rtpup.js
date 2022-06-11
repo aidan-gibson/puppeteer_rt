@@ -43,48 +43,14 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var reg = require("./regexConstants");
 var fs_1 = require("fs");
 var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
-var login = "aigibson";
-var reedLoginURL = "https://weblogin.reed.edu/?cosign-help&";
-var ticketURL = "https://help.reed.edu/Ticket/Display.html?id=";
+var login = 'aigibson';
+var reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&';
+var ticketURL = 'https://help.reed.edu/Ticket/Display.html?id=';
 var currentTicket = 336797;
 var puppeteer = require('puppeteer');
-//i means case insensitive, \b are word borders
-var googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i];
-var NOgoogleDriveRegexList = [];
-var googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i];
-var NOgoogleGroupRegexList = [];
-var hardwareRegexList = [/iMac/];
-var NOhardwareRegexList = [];
-var libraryRelatedRegexList = [/e-book/i, /library/i, /librarian/i, /IMC/, /LangLab/i];
-var NOlibraryRelatedRegexList = [];
-var massEmailRegexList = [/release email/i, /release message/i, /groups.reed.edu admins: Message Pending/, /mass email/i, /approve(.*)Newsletter/i];
-var NOmassEmailRegexList = [];
-var microsoftRegexList = [/microsoft/i, /powerpoint/i, /\bexcel\b/i, /Word/, /\bmacro\b/i, /.doc\b/, /.docx\b/, /ppt\b/, /pptx\b/]; //got rid of /Office/ cuz Office of the Registrar etc can be in signatures, /csv/, /.xl/ cuz csv could be attached and it's totally unrelated, etc
-var NOmicrosoftRegexList = [/template/i]; //word thesis template issues are NOT microsoft tag
-var networkRegexList = [/wifi/i, /ethernet/i, /connection issue/i, /reed1x/i, /fluke/i, /MAC/, /mac address/i, /network/i, /\bdns\b/i, /trouble connect/i, /issues accessing/i, /alexa/i, /netreg/i, /xenia/, /wireless maint/i]; ///([a-z0-9]+[.])*reed[.]edu/i removed this, too ambig. ie account-tools.reed.edu is clearly password reset only.
-var NOnetworkRegexList = [/groups.reed.edu/];
-var passwordResetRegexList = [/password reset/i, /forgot password/i, /kerberos pass/i, /account-tools/]; //can't use just "password" cuz ben's signature is "cis will never ask for ur password" AND it'd conflict w "Software" tag looking for 1password
-var NOpasswordResetRegexList = [];
-var phishRegexList = [/phish/i, /scam/i, /spam/i];
-var NOphishRegexList = [/Security Updates for Reed Computers/];
-var printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i];
-var NOprintingRegexList = [];
-var reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/, /auth group/i, /access IRIS/];
-var NOreedAccountsRegexList = [];
-var softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i, /software update/i, /software upgrade/i]; //removed /\bdriver\b/i
-var NOsoftwareRegexList = [];
-var thesisRegexList = [/thesis/i]; //[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
-var NOthesisRegexList = [/vpn/i];
-var twoFactorRegexList = [/duo/i, /twostep/i, /two-step/i, /hardware token/i];
-var NOtwoFactorRegexList = [];
-var nameChangeRegexList = [/name change/i, /change name/i];
-var NOnameChangeRegexList = [];
-var virusMalwareRegexList = [/falcon/i, /crowdstrike/i, /virus/i, /malware/i, /malicious/i, /trojan/i,];
-var NOvirusMalwareRegexList = [/Security Updates for Reed Computers/];
-var noTagRegexList = [/Events & Programs Newsletter for Reed Students/, /To:(.*)faculty@reed.edu/, /To:(.*)staff@reed.edu/, /Dorkbot Monthly/, /Banner Database Outage/];
-var NOnoTagRegexList = [];
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var browser, page;
@@ -98,10 +64,11 @@ function run() {
                 ];
                 case 1:
                     browser = _a.sent();
-                    return [4 /*yield*/, browser.pages()];
+                    return [4 /*yield*/, browser.pages()]; //this fixes extra empty tab being open instead of above line
                 case 2:
-                    page = (_a.sent())[0];
-                    return [4 /*yield*/, page.setViewport({ width: 1692, height: 777 })];
+                    page = (_a.sent()) //this fixes extra empty tab being open instead of above line
+                    [0];
+                    return [4 /*yield*/, page.setViewport({ width: 1692, height: 777 })]; //({ width: 850, height: 800}); //doesn't matter
                 case 3:
                     _a.sent(); //({ width: 850, height: 800}); //doesn't matter
                     return [4 /*yield*/, page.goto(reedLoginURL + ticketURL + currentTicket)];
@@ -128,12 +95,24 @@ function checkSpecificBox(page, checkBoxSelector) {
             switch (_a.label) {
                 case 0: 
                 //required, otherwise will attempt to click too soon and throw error
-                return [4 /*yield*/, page.waitForSelector("input[value=\"".concat(checkBoxSelector, "\"]"))];
+                return [4 /*yield*/, page.waitForSelector("input[value=\"".concat(checkBoxSelector, "\"]"))
+                    // @ts-ignore
+                ];
                 case 1:
                     //required, otherwise will attempt to click too soon and throw error
                     _a.sent();
                     // @ts-ignore
-                    return [4 /*yield*/, page.$eval("input[value=\"".concat(checkBoxSelector, "\"]"), function (check) { return check.checked = true; })];
+                    return [4 /*yield*/, page.$eval("input[value=\"".concat(checkBoxSelector, "\"]"), function (check) { return (check.checked = true); })
+                        // old inefficient way, leaving so my future self can see
+                        //if checkbox is already checked, don't click!
+                        //const checkbox = await page.$(`input[value="google drive"]`);
+                        //let checked = await (await checkbox.getProperty('checked')).jsonValue(); //true if checked, false if unchecked
+                        //if (!checked){
+                        //await checkbox.click();//}
+                        //await page.click(`input[value="google drive"]`);//}
+                        // instead of checking if checked, then clicking, I can directly set checked to true
+                        //await page.$eval(`input[value="google drive"]`, check => check.checked = true);
+                    ];
                 case 2:
                     // @ts-ignore
                     _a.sent();
@@ -158,8 +137,13 @@ function ticketFix(page) {
                     ];
                 case 2:
                     _e.sent();
-                    titleSelector = ".CustomField__Title_ > span.value";
-                    return [4 /*yield*/, page.waitForSelector(titleSelector)];
+                    titleSelector = ".CustomField__Title_ > span.value" //must check if there are multiple
+                    ;
+                    return [4 /*yield*/, page.waitForSelector(titleSelector)
+                        //this was from when I didn't realize there could b mult requestors
+                        //let titleElement = await page.$(titleSelector);
+                        //let titleValue = await page.evaluate(el => el.textContent, titleElement);
+                    ]; //TODO this waits for FIRST selector matching, what if the first loads faster than the second??
                 case 3:
                     _e.sent(); //TODO this waits for FIRST selector matching, what if the first loads faster than the second??
                     return [4 /*yield*/, page.$$(titleSelector)];
@@ -178,7 +162,7 @@ function ticketFix(page) {
                     return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, titleElement)];
                 case 8:
                     titleValue = _e.sent();
-                    if (titleValue.includes("emeritus") || titleValue.includes("Emeritus") || titleValue.includes("emerita") || titleValue.includes("Emerita")) {
+                    if (titleValue.includes('emeritus') || titleValue.includes('Emeritus') || titleValue.includes('emerita') || titleValue.includes('Emerita')) {
                         emeritus = true;
                     }
                     _e.label = 9;
@@ -222,22 +206,22 @@ function ticketFix(page) {
                     return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, affiliationsElement)];
                 case 22:
                     affiliationsValue = _e.sent();
-                    if (affiliationsValue.includes("faculty")) {
+                    if (affiliationsValue.includes('faculty')) {
                         faculty = true;
                     }
-                    else if (affiliationsValue.includes("student")) {
+                    else if (affiliationsValue.includes('student')) {
                         student = true;
                     }
-                    else if (affiliationsValue.includes("affiliate")) {
+                    else if (affiliationsValue.includes('affiliate')) {
                         affiliate = true;
                     }
-                    else if (affiliationsValue.includes("alumni") || affiliationsValue.includes("alum")) {
+                    else if (affiliationsValue.includes('alumni') || affiliationsValue.includes('alum')) {
                         alumni = true;
                     }
-                    else if (affiliationsValue.includes("affiliate")) {
+                    else if (affiliationsValue.includes('affiliate')) {
                         affiliate = true;
                     }
-                    else if (affiliationsValue.includes("staff")) {
+                    else if (affiliationsValue.includes('staff')) {
                         staff = true;
                     }
                     _e.label = 23;
@@ -279,7 +263,7 @@ function ticketFix(page) {
                 case 36:
                     emailValue = _e.sent();
                     emails.push(emailValue);
-                    if (!(emailValue.includes("@reed.edu"))) {
+                    if (!emailValue.includes('@reed.edu')) {
                         nonReedEmail = true;
                     }
                     _e.label = 37;
@@ -302,7 +286,7 @@ function ticketFix(page) {
                     return [7 /*endfinally*/];
                 case 44: return [7 /*endfinally*/];
                 case 45:
-                    if (!emeritus && !student && !affiliate && !alumni && !staff && !faculty && !emails.toString().includes("@reed.edu")) {
+                    if (!emeritus && !student && !affiliate && !alumni && !staff && !faculty && !emails.toString().includes('@reed.edu')) {
                         nonReedEmail = true;
                     }
                     googleDrive = false;
@@ -322,8 +306,10 @@ function ticketFix(page) {
                     nameChange = false;
                     virusMalware = false;
                     noTag = false;
-                    messages = "";
-                    ticketHistorySelector = "div.history-container > div.message";
+                    messages = '' //all emails in this string
+                    ;
+                    ticketHistorySelector = "div.history-container > div.message" //only add it if it's a comment, correspondance, or the initial ticket opening. we don't want others, esp "Support Tags xyz deleted" which could falsely re-trigger the regex for that tag. message class is only transaction we're interested in
+                    ;
                     return [4 /*yield*/, page.waitForSelector(ticketHistorySelector)];
                 case 46:
                     _e.sent();
@@ -344,7 +330,7 @@ function ticketFix(page) {
                     emailValue = _e.sent() //this gives proper spacing after changing textContent to innerText
                     ;
                     if (!emailValue.includes())
-                        messages += emailValue + "\n";
+                        messages += emailValue + '\n';
                     _e.label = 52;
                 case 52: return [3 /*break*/, 49];
                 case 53: return [3 /*break*/, 60];
@@ -365,121 +351,122 @@ function ticketFix(page) {
                     return [7 /*endfinally*/];
                 case 59: return [7 /*endfinally*/];
                 case 60:
-                    messages += emails + "\n"; //putting the email values in messages to simplify search
-                    return [4 /*yield*/, page.waitForSelector("#header > h1")]; //title of ticket
+                    messages += emails + '\n'; //putting the email values in messages to simplify search
+                    return [4 /*yield*/, page.waitForSelector('#header > h1')]; //title of ticket
                 case 61:
                     _e.sent(); //title of ticket
-                    return [4 /*yield*/, page.$("#header > h1")];
+                    return [4 /*yield*/, page.$('#header > h1')];
                 case 62:
                     ticketTitleElement = _e.sent();
                     return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, ticketTitleElement)];
                 case 63:
                     ticketTitleValue = _e.sent();
-                    messages += ticketTitleValue + "\n";
+                    messages += ticketTitleValue + '\n';
                     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
                     //console.log(messages)
-                    if (emails.toString().includes("malwarebytes.com")) {
+                    if (emails.toString().includes('malwarebytes.com')) {
                         virusMalware = true;
                     }
-                    else if (emails.toString().includes("crowdstrike")) {
+                    else if (emails.toString().includes('crowdstrike')) {
                         virusMalware = true;
                     }
-                    else if (emails.toString().includes("etrieve@reed.edu")) {
+                    else if (emails.toString().includes('etrieve@reed.edu')) {
                         noTag = true;
                     } //no tag, this is the "Notification of Staff Hire" emails
-                    else if (ticketTitleValue.includes("Welcome to Reed College | Notes for your first day of work")) { } //no tag https://help.reed.edu/Ticket/Display.html?id=347871
-                    else if (ticketTitleValue.includes("Welcome to Reed College")) {
+                    else if (ticketTitleValue.includes('Welcome to Reed College | Notes for your first day of work')) {
+                    } //no tag https://help.reed.edu/Ticket/Display.html?id=347871
+                    else if (ticketTitleValue.includes('Welcome to Reed College')) {
                         noTag = true;
                     } //no tag
-                    else if (emails.toString().includes("msgappr@groups.reed.edu") || ticketTitleValue.includes("groups.reed.edu admins: Message Pending")) {
+                    else if (emails.toString().includes('msgappr@groups.reed.edu') || ticketTitleValue.includes('groups.reed.edu admins: Message Pending')) {
                         massEmail = true;
                     }
-                    else if (ticketTitleValue.includes("Shared Drive Request")) {
+                    else if (ticketTitleValue.includes('Shared Drive Request')) {
                         googleDrive = true;
                     }
-                    else if (ticketTitleValue.includes("Google Group Request")) {
+                    else if (ticketTitleValue.includes('Google Group Request')) {
                         googleGroup = true;
                     }
-                    else if (ticketTitleValue.includes("[Ask a librarian]")) {
+                    else if (ticketTitleValue.includes('[Ask a librarian]')) {
                         libraryRelated = true;
                     }
-                    else if (emails.toString().includes("er-problem-report@reed.edu")) {
+                    else if (emails.toString().includes('er-problem-report@reed.edu')) {
                         libraryRelated = true;
                     }
-                    else if (emails.toString().includes("msonlineservicesteam@microsoftonline.com")) {
+                    else if (emails.toString().includes('msonlineservicesteam@microsoftonline.com')) {
                         microsoft = true;
                         passwordReset = true;
                     }
-                    else if (emails.toString().includes("@microsoft.com")) {
+                    else if (emails.toString().includes('@microsoft.com')) {
                         microsoft = true;
                     }
-                    else if (emails.toString().includes("@microsoftonline.com")) {
+                    else if (emails.toString().includes('@microsoftonline.com')) {
                         microsoft = true;
                     }
-                    else if (ticketTitleValue.includes("Wireless Maintenance")) {
+                    else if (ticketTitleValue.includes('Wireless Maintenance')) {
                         network = true;
                     }
-                    else if (ticketTitleValue.includes("ipp.reed.edu")) {
+                    else if (ticketTitleValue.includes('ipp.reed.edu')) {
                         network = true;
                         printing = true;
                     }
-                    else if (ticketTitleValue.includes("Kerberos password reset")) {
+                    else if (ticketTitleValue.includes('Kerberos password reset')) {
                         passwordReset = true;
                     } //https://help.reed.edu/Ticket/Display.html?id=344626
-                    else if (emails.toString().includes("noreply-spamdigest@google.com")) {
+                    else if (emails.toString().includes('noreply-spamdigest@google.com')) {
                         phish = true;
                     }
-                    else if (emails.toString().includes("xerox") || (emails.toString().includes("ctx"))) {
+                    else if (emails.toString().includes('xerox') || emails.toString().includes('ctx')) {
                         printing = true;
                     }
-                    else if (ticketTitleValue.includes("Reed computing account")) {
+                    else if (ticketTitleValue.includes('Reed computing account')) {
                         reedAccounts = true;
                     }
-                    else if (ticketTitleValue.includes("Your Reed computing accounts are scheduled to be closed")) {
+                    else if (ticketTitleValue.includes('Your Reed computing accounts are scheduled to be closed')) {
                         reedAccounts = true;
                     }
-                    else if (messages.includes("Please follow the steps below to setup your Reed account")) {
+                    else if (messages.includes('Please follow the steps below to setup your Reed account')) {
                         reedAccounts = true;
                     }
-                    else if (ticketTitleValue.includes("Account Closure for Graduates")) {
+                    else if (ticketTitleValue.includes('Account Closure for Graduates')) {
                         reedAccounts = true;
                     }
-                    else if (ticketTitleValue.includes("Account Tool")) {
+                    else if (ticketTitleValue.includes('Account Tool')) {
                         reedAccounts = true;
                     }
-                    else if (ticketTitleValue.includes("Computing at Reed")) {
+                    else if (ticketTitleValue.includes('Computing at Reed')) {
                         reedAccounts = true;
                     }
-                    else if (ticketTitleValue.includes("Duo") || ticketTitleValue.includes("DUO") || ticketTitleValue.includes("duo")) {
+                    else if (ticketTitleValue.includes('Duo') || ticketTitleValue.includes('DUO') || ticketTitleValue.includes('duo')) {
                         twoFactor = true;
                     }
-                    else if (emails.toString().includes("schrodinger.com")) {
+                    else if (emails.toString().includes('schrodinger.com')) {
                         noTag = true;
                     }
-                    else if (ticketTitleValue.includes("google group")) {
+                    else if (ticketTitleValue.includes('google group')) {
                         googleGroup = true;
                     }
-                    else if (ticketTitleValue.includes("Google Group")) {
+                    else if (ticketTitleValue.includes('Google Group')) {
                         googleGroup = true;
                     }
                     else {
-                        googleDriveMatch = googleDriveRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleDriveRegexList.some(function (rx) { return rx.test(messages); })));
-                        googleGroupMatch = googleGroupRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOgoogleGroupRegexList.some(function (rx) { return rx.test(messages); })));
-                        hardwareMatch = hardwareRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOhardwareRegexList.some(function (rx) { return rx.test(messages); })));
-                        libraryRelatedMatch = libraryRelatedRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOlibraryRelatedRegexList.some(function (rx) { return rx.test(messages); })));
-                        massEmailMatch = massEmailRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOmassEmailRegexList.some(function (rx) { return rx.test(messages); })));
-                        microsoftMatch = microsoftRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOmicrosoftRegexList.some(function (rx) { return rx.test(messages); })));
-                        networkMatch = networkRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOnetworkRegexList.some(function (rx) { return rx.test(messages); })));
-                        passwordResetMatch = passwordResetRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOpasswordResetRegexList.some(function (rx) { return rx.test(messages); })));
-                        phishMatch = phishRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOphishRegexList.some(function (rx) { return rx.test(messages); })));
-                        printingMatch = printingRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOprintingRegexList.some(function (rx) { return rx.test(messages); })));
-                        reedAccountsMatch = reedAccountsRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOreedAccountsRegexList.some(function (rx) { return rx.test(messages); })));
-                        softwareMatch = softwareRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOsoftwareRegexList.some(function (rx) { return rx.test(messages); })));
-                        thesisMatch = thesisRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOthesisRegexList.some(function (rx) { return rx.test(messages); })));
-                        twoFactorMatch = twoFactorRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOtwoFactorRegexList.some(function (rx) { return rx.test(messages); })));
-                        nameChangeMatch = nameChangeRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOnameChangeRegexList.some(function (rx) { return rx.test(messages); })));
-                        virusMalwareMatch = virusMalwareRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOvirusMalwareRegexList.some(function (rx) { return rx.test(messages); })));
-                        noTagMatch = noTagRegexList.some(function (rx) { return rx.test(messages); }) && (!(NOnoTagRegexList.some(function (rx) { return rx.test(messages); })));
+                        googleDriveMatch = reg.googleDriveRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noGoogleDriveRegexList.some(function (rx) { return rx.test(messages); });
+                        googleGroupMatch = reg.googleGroupRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noGoogleGroupRegexList.some(function (rx) { return rx.test(messages); });
+                        hardwareMatch = reg.hardwareRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noHardwareRegexList.some(function (rx) { return rx.test(messages); });
+                        libraryRelatedMatch = reg.libraryRelatedRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noLibraryRelatedRegexList.some(function (rx) { return rx.test(messages); });
+                        massEmailMatch = reg.massEmailRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noMassEmailRegexList.some(function (rx) { return rx.test(messages); });
+                        microsoftMatch = reg.microsoftRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noMicrosoftRegexList.some(function (rx) { return rx.test(messages); });
+                        networkMatch = reg.networkRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noNetworkRegexList.some(function (rx) { return rx.test(messages); });
+                        passwordResetMatch = reg.passwordResetRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noPasswordResetRegexList.some(function (rx) { return rx.test(messages); });
+                        phishMatch = reg.phishRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noPhishRegexList.some(function (rx) { return rx.test(messages); });
+                        printingMatch = reg.printingRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noPrintingRegexList.some(function (rx) { return rx.test(messages); });
+                        reedAccountsMatch = reg.reedAccountsRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noReedAccountsRegexList.some(function (rx) { return rx.test(messages); });
+                        softwareMatch = reg.softwareRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noSoftwareRegexList.some(function (rx) { return rx.test(messages); });
+                        thesisMatch = reg.thesisRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noThesisRegexList.some(function (rx) { return rx.test(messages); });
+                        twoFactorMatch = reg.twoFactorRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noTwoFactorRegexList.some(function (rx) { return rx.test(messages); });
+                        nameChangeMatch = reg.nameChangeRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noNameChangeRegexList.some(function (rx) { return rx.test(messages); });
+                        virusMalwareMatch = reg.virusMalwareRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noVirusMalwareRegexList.some(function (rx) { return rx.test(messages); });
+                        noTagMatch = reg.noTagRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noNoTagRegexList.some(function (rx) { return rx.test(messages); });
                         //logic of Match bools -> real bools
                         //this may seem redundant to have the "match" set of bools as well, but it gives extra flexibility
                         if (noTagMatch) {
@@ -540,17 +527,20 @@ function ticketFix(page) {
                         }
                         //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
                         if (!googleDriveMatch && !googleGroupMatch && !hardwareMatch && !libraryRelatedMatch && !massEmailMatch && !microsoftMatch && !networkMatch && !passwordResetMatch && !phishMatch && !printingMatch && !reedAccountsMatch && !softwareMatch && !thesisMatch && !twoFactorMatch && !nameChangeMatch && !virusMalwareMatch && !noTagMatch && !noTag) {
-                            console.log("FLAG NO REGEX MATCH " + page.url());
+                            console.log('FLAG NO REGEX MATCH ' + page.url());
                         }
                     } //end of else regex section
                     currURL = page.url();
                     modifyURL = currURL.replace('Display', 'Modify');
-                    return [4 /*yield*/, page.goto(modifyURL)];
+                    return [4 /*yield*/, page.goto(modifyURL)
+                        //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
+                        //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
+                    ];
                 case 64:
                     _e.sent();
                     //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
                     //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
-                    console.log("Current Ticket: " + page.url());
+                    console.log('Current Ticket: ' + page.url());
                     return [4 /*yield*/, page.$("input[value=\"google drive\"]")];
                 case 65:
                     googleDriveCheckbox = _e.sent();
@@ -559,7 +549,7 @@ function ticketFix(page) {
                 case 67:
                     googleDriveChecked = _e.sent();
                     if (googleDrive != googleDriveChecked) {
-                        console.log("Algo Google Drive: " + googleDrive + "Ticket Google Drive: " + googleDriveChecked);
+                        console.log('Algo Google Drive: ' + googleDrive + 'Ticket Google Drive: ' + googleDriveChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"google group\"]")];
                 case 68:
@@ -569,7 +559,7 @@ function ticketFix(page) {
                 case 70:
                     googleGroupChecked = _e.sent();
                     if (googleGroup != googleGroupChecked) {
-                        console.log("Algo Google Group: " + googleGroup + "Ticket Google Group: " + googleGroupChecked);
+                        console.log('Algo Google Group: ' + googleGroup + 'Ticket Google Group: ' + googleGroupChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"hardware\"]")];
                 case 71:
@@ -579,7 +569,7 @@ function ticketFix(page) {
                 case 73:
                     hardwareChecked = _e.sent();
                     if (hardware != hardwareChecked) {
-                        console.log("Algo Hardware: " + hardware + "Ticket Hardware: " + hardwareChecked);
+                        console.log('Algo Hardware: ' + hardware + 'Ticket Hardware: ' + hardwareChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"library related\"]")];
                 case 74:
@@ -589,7 +579,7 @@ function ticketFix(page) {
                 case 76:
                     libraryRelatedChecked = _e.sent();
                     if (libraryRelated != libraryRelatedChecked) {
-                        console.log("Algo LibraryRelated: " + libraryRelated + "Ticket LibraryRelated: " + libraryRelatedChecked);
+                        console.log('Algo LibraryRelated: ' + libraryRelated + 'Ticket LibraryRelated: ' + libraryRelatedChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"mass email\"]")];
                 case 77:
@@ -599,7 +589,7 @@ function ticketFix(page) {
                 case 79:
                     massEmailChecked = _e.sent();
                     if (massEmail != massEmailChecked) {
-                        console.log("Algo massEmail: " + massEmail + "Ticket massEmail: " + massEmailChecked);
+                        console.log('Algo massEmail: ' + massEmail + 'Ticket massEmail: ' + massEmailChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"microsoft\"]")];
                 case 80:
@@ -609,9 +599,9 @@ function ticketFix(page) {
                 case 82:
                     microsoftChecked = _e.sent();
                     if (microsoft != microsoftChecked) {
-                        console.log("Algo microsoft: " + microsoft + "Ticket microsoft: " + microsoftChecked);
-                        for (i = 0; i < microsoftRegexList.length; i++) {
-                            console.log(microsoftRegexList[i].exec(messages));
+                        console.log('Algo microsoft: ' + microsoft + 'Ticket microsoft: ' + microsoftChecked);
+                        for (i = 0; i < reg.microsoftRegexList.length; i++) {
+                            console.log(reg.microsoftRegexList[i].exec(messages));
                         }
                     }
                     return [4 /*yield*/, page.$("input[value=\"network\"]")];
@@ -622,7 +612,7 @@ function ticketFix(page) {
                 case 85:
                     networkChecked = _e.sent();
                     if (network != networkChecked) {
-                        console.log("Algo network: " + network + "Ticket network: " + networkChecked);
+                        console.log('Algo network: ' + network + 'Ticket network: ' + networkChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"password reset\"]")];
                 case 86:
@@ -632,7 +622,7 @@ function ticketFix(page) {
                 case 88:
                     passwordResetChecked = _e.sent();
                     if (passwordReset != passwordResetChecked) {
-                        console.log("Algo passwordReset: " + passwordReset + "Ticket passwordReset: " + passwordResetChecked);
+                        console.log('Algo passwordReset: ' + passwordReset + 'Ticket passwordReset: ' + passwordResetChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"phish report/fwd\"]")];
                 case 89:
@@ -642,7 +632,7 @@ function ticketFix(page) {
                 case 91:
                     phishChecked = _e.sent();
                     if (phish != phishChecked) {
-                        console.log("Algo phish: " + phish + "Ticket phish: " + phishChecked);
+                        console.log('Algo phish: ' + phish + 'Ticket phish: ' + phishChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"printers/copiers\"]")];
                 case 92:
@@ -652,7 +642,7 @@ function ticketFix(page) {
                 case 94:
                     printingChecked = _e.sent();
                     if (printing != printingChecked) {
-                        console.log("Algo printing: " + printing + "Ticket printing: " + printingChecked);
+                        console.log('Algo printing: ' + printing + 'Ticket printing: ' + printingChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"reed accounts & access\"]")];
                 case 95:
@@ -662,7 +652,7 @@ function ticketFix(page) {
                 case 97:
                     reedAccountsChecked = _e.sent();
                     if (reedAccounts != reedAccountsChecked) {
-                        console.log("Algo reedAccounts: " + reedAccounts + "Ticket reedAccounts: " + reedAccountsChecked);
+                        console.log('Algo reedAccounts: ' + reedAccounts + 'Ticket reedAccounts: ' + reedAccountsChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"software\"]")];
                 case 98:
@@ -672,9 +662,9 @@ function ticketFix(page) {
                 case 100:
                     softwareChecked = _e.sent();
                     if (software != softwareChecked) {
-                        console.log("Algo software: " + software + "Ticket software: " + softwareChecked);
-                        for (i = 0; i < softwareRegexList.length; i++) {
-                            console.log(softwareRegexList[i].exec(messages));
+                        console.log('Algo software: ' + software + 'Ticket software: ' + softwareChecked);
+                        for (i = 0; i < reg.softwareRegexList.length; i++) {
+                            console.log(reg.softwareRegexList[i].exec(messages));
                         }
                     }
                     return [4 /*yield*/, page.$("input[value=\"thesis\"]")];
@@ -685,7 +675,7 @@ function ticketFix(page) {
                 case 103:
                     thesisChecked = _e.sent();
                     if (thesis != thesisChecked) {
-                        console.log("Algo thesis: " + thesis + "Ticket thesis: " + thesisChecked);
+                        console.log('Algo thesis: ' + thesis + 'Ticket thesis: ' + thesisChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"two-factor\"]")];
                 case 104:
@@ -695,7 +685,7 @@ function ticketFix(page) {
                 case 106:
                     twoFactorChecked = _e.sent();
                     if (twoFactor != twoFactorChecked) {
-                        console.log("Algo twoFactor: " + twoFactor + "Ticket twoFactor: " + twoFactorChecked);
+                        console.log('Algo twoFactor: ' + twoFactor + 'Ticket twoFactor: ' + twoFactorChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"user/name change\"]")];
                 case 107:
@@ -705,7 +695,7 @@ function ticketFix(page) {
                 case 109:
                     nameChangeChecked = _e.sent();
                     if (nameChange != nameChangeChecked) {
-                        console.log("Algo nameChange: " + nameChange + "Ticket nameChange: " + nameChangeChecked);
+                        console.log('Algo nameChange: ' + nameChange + 'Ticket nameChange: ' + nameChangeChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"virus/malware\"]")];
                 case 110:
@@ -715,9 +705,9 @@ function ticketFix(page) {
                 case 112:
                     virusMalwareChecked = _e.sent();
                     if (virusMalware != virusMalwareChecked) {
-                        console.log("Algo virusMalware: " + virusMalware + "Ticket virusMalware: " + virusMalwareChecked);
+                        console.log('Algo virusMalware: ' + virusMalware + 'Ticket virusMalware: ' + virusMalwareChecked);
                     }
-                    console.log("End");
+                    console.log('End');
                     return [2 /*return*/];
             }
         });

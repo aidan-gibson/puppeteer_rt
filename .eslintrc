@@ -1,0 +1,60 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "node": true
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "variable",
+        "modifiers": ["const"],
+        "format": ["camelCase","UPPER_CASE"]
+      },
+      {
+        "selector": "variable",
+        "format": [
+          "camelCase"
+        ]
+      },
+      {
+        "selector": "function",
+        "format": [
+          "camelCase"
+        ]
+      },
+      {
+        "selector": "class",
+        "format": [
+          "PascalCase"
+        ]
+      },
+      {
+        "selector": "interface",
+        "format": [
+          "PascalCase"
+        ]
+      }
+    ],
+    "@typescript-eslint/ban-ts-comment": "off",
+    "no-prototype-builtins": "off",
+    "@typescript-eslint/no-empty-function": "off"
+  }
+}

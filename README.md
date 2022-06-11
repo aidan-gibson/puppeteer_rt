@@ -45,3 +45,6 @@ move a lot of Puppeteer RT Tags.md to here for posterity etc
   * Enabled JSON5 for all JSON (so comments work) with https://www.jetbrains.com/help/webstorm/json.html#ws_json_using_schemas (this doesn't actually allow comments in package.json, couldn't fig out tho)
   * Downloaded Puppeteer library via Languages & Frameworks > Javascript > Libraries > Download
   * If webstorm does the thing where the root dir isn't part of the proj and all files are highlighted yellow, File > Attach Project select root folder
+
+.prettierrc.json5 is config file for prettier. opted for json5 so I can have comments
+eslint-config-prettier makes sure eslint and prettier play nice
