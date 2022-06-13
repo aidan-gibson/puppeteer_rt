@@ -49,41 +49,49 @@ var fs_1 = require("fs");
 var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = 'aigibson';
 var reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&';
-var ticketURL = 'https://help.reed.edu/Ticket/Display.html?id=';
-var currentTicket = 345842; //336797
-function run() {
+//make sure u edit search to show unlimited rows, not just 50
+var searchURL = 'https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=(%20Queue%20%3D%20%27cus%27%20OR%20Queue%20%3D%20%27twatch%27%20)%20AND%20%27CF.%7BSupport%20Tags%7D%27%20IS%20NULL%20AND%20Created%20%3C%20%272022-04-01%27%20AND%20Created%20%3E%20%272022-02-28%27&RowsPerPage=0&SavedChartSearchId=new&SavedSearchId=new';
+function run(currentTicket) {
     return __awaiter(this, void 0, void 0, function () {
-        var browser, page;
+        var ticketURL, browser, page;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, puppeteer.launch({
-                    //devtools: true, //this also forces {headless: false}
-                    //dumpio: true //captures all console messages to output https://stackoverflow.com/questions/47539043/how-to-get-all-console-messages-with-puppeteer-including-errors-csp-violations
-                    })
-                    //const page = await browser.newPage()
-                ];
+                case 0:
+                    ticketURL = 'https://help.reed.edu/Ticket/Display.html?id=';
+                    return [4 /*yield*/, puppeteer.launch({
+                        //devtools: true, //this also forces {headless: false}
+                        //dumpio: true //captures all console messages to output https://stackoverflow.com/questions/47539043/how-to-get-all-console-messages-with-puppeteer-including-errors-csp-violations
+                        })
+                        //const page = await browser.newPage()
+                    ];
                 case 1:
                     browser = _a.sent();
-                    return [4 /*yield*/, browser.pages()]; //this fixes extra empty tab being open instead of above line
+                    return [4 /*yield*/, browser.pages()
+                        //await page.setViewport({ width: 1692, height: 777 }) //({ width: 850, height: 800}); //doesn't matter
+                    ]; //this fixes extra empty tab being open instead of above line
                 case 2:
                     page = (_a.sent()) //this fixes extra empty tab being open instead of above line
                     [0];
-                    return [4 /*yield*/, page.setViewport({ width: 1692, height: 777 })]; //({ width: 850, height: 800}); //doesn't matter
-                case 3:
-                    _a.sent(); //({ width: 850, height: 800}); //doesn't matter
+                    //await page.setViewport({ width: 1692, height: 777 }) //({ width: 850, height: 800}); //doesn't matter
                     return [4 /*yield*/, page.goto(reedLoginURL + ticketURL + currentTicket)];
-                case 4:
+                case 3:
+                    //await page.setViewport({ width: 1692, height: 777 }) //({ width: 850, height: 800}); //doesn't matter
                     _a.sent();
                     return [4 /*yield*/, page.type('[name="login"]', login)];
-                case 5:
+                case 4:
                     _a.sent();
                     return [4 /*yield*/, page.type('[name="password"]', pw)];
-                case 6:
+                case 5:
                     _a.sent();
                     return [4 /*yield*/, page.click("button[class=\"btn btn-primary pull-right\"]")];
+                case 6:
+                    _a.sent();
+                    return [4 /*yield*/, ticketFix(page, currentTicket)];
                 case 7:
                     _a.sent();
-                    ticketFix(page);
+                    return [4 /*yield*/, browser.close()];
+                case 8:
+                    _a.sent();
                     return [2 /*return*/];
             }
         });
@@ -121,10 +129,10 @@ function checkSpecificBox(page, checkBoxSelector) {
         });
     });
 }
-function ticketFix(page) {
+function ticketFix(page, currentTicket) {
     var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
     return __awaiter(this, void 0, void 0, function () {
-        var quotedTextSelector, titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, queue, queueValue, googleDriveCheckbox, googleDriveChecked, googleGroupCheckbox, googleGroupChecked, hardwareCheckbox, hardwareChecked, libraryRelatedCheckbox, libraryRelatedChecked, massEmailCheckbox, massEmailChecked, microsoftCheckbox, microsoftChecked, i, networkCheckbox, networkChecked, passwordResetCheckbox, passwordResetChecked, phishCheckbox, phishChecked, printingCheckbox, printingChecked, reedAccountsCheckbox, reedAccountsChecked, softwareCheckbox, softwareChecked, i, thesisCheckbox, thesisChecked, twoFactorCheckbox, twoFactorChecked, nameChangeCheckbox, nameChangeChecked, virusMalwareCheckbox, virusMalwareChecked;
+        var quotedTextSelector, emeritus, titleSelector, titleElements, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, error_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, queue, queueValue;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -137,6 +145,10 @@ function ticketFix(page) {
                     ];
                 case 2:
                     _e.sent();
+                    emeritus = false;
+                    _e.label = 3;
+                case 3:
+                    _e.trys.push([3, 19, , 20]);
                     titleSelector = ".CustomField__Title_ > span.value" //must check if there are multiple
                     ;
                     return [4 /*yield*/, page.waitForSelector(titleSelector)
@@ -144,47 +156,51 @@ function ticketFix(page) {
                         //let titleElement = await page.$(titleSelector);
                         //let titleValue = await page.evaluate(el => el.textContent, titleElement);
                     ]; //this waits for FIRST selector matching, what if the first loads faster than the second??
-                case 3:
+                case 4:
                     _e.sent(); //this waits for FIRST selector matching, what if the first loads faster than the second??
                     return [4 /*yield*/, page.$$(titleSelector)];
-                case 4:
-                    titleElements = _e.sent();
-                    emeritus = false;
-                    _e.label = 5;
                 case 5:
-                    _e.trys.push([5, 11, 12, 17]);
-                    titleElements_1 = __asyncValues(titleElements);
+                    titleElements = _e.sent();
                     _e.label = 6;
-                case 6: return [4 /*yield*/, titleElements_1.next()];
-                case 7:
-                    if (!(titleElements_1_1 = _e.sent(), !titleElements_1_1.done)) return [3 /*break*/, 10];
+                case 6:
+                    _e.trys.push([6, 12, 13, 18]);
+                    titleElements_1 = __asyncValues(titleElements);
+                    _e.label = 7;
+                case 7: return [4 /*yield*/, titleElements_1.next()];
+                case 8:
+                    if (!(titleElements_1_1 = _e.sent(), !titleElements_1_1.done)) return [3 /*break*/, 11];
                     titleElement = titleElements_1_1.value;
                     return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, titleElement)];
-                case 8:
+                case 9:
                     titleValue = _e.sent();
                     if (titleValue.includes('emeritus') || titleValue.includes('Emeritus') || titleValue.includes('emerita') || titleValue.includes('Emerita')) {
                         emeritus = true;
                     }
-                    _e.label = 9;
-                case 9: return [3 /*break*/, 6];
-                case 10: return [3 /*break*/, 17];
-                case 11:
+                    _e.label = 10;
+                case 10: return [3 /*break*/, 7];
+                case 11: return [3 /*break*/, 18];
+                case 12:
                     e_1_1 = _e.sent();
                     e_1 = { error: e_1_1 };
-                    return [3 /*break*/, 17];
-                case 12:
-                    _e.trys.push([12, , 15, 16]);
-                    if (!(titleElements_1_1 && !titleElements_1_1.done && (_a = titleElements_1.return))) return [3 /*break*/, 14];
-                    return [4 /*yield*/, _a.call(titleElements_1)];
+                    return [3 /*break*/, 18];
                 case 13:
+                    _e.trys.push([13, , 16, 17]);
+                    if (!(titleElements_1_1 && !titleElements_1_1.done && (_a = titleElements_1.return))) return [3 /*break*/, 15];
+                    return [4 /*yield*/, _a.call(titleElements_1)];
+                case 14:
                     _e.sent();
-                    _e.label = 14;
-                case 14: return [3 /*break*/, 16];
-                case 15:
+                    _e.label = 15;
+                case 15: return [3 /*break*/, 17];
+                case 16:
                     if (e_1) throw e_1.error;
                     return [7 /*endfinally*/];
-                case 16: return [7 /*endfinally*/];
-                case 17:
+                case 17: return [7 /*endfinally*/];
+                case 18: return [3 /*break*/, 20];
+                case 19:
+                    error_1 = _e.sent();
+                    console.error(error_1);
+                    return [3 /*break*/, 20];
+                case 20:
                     affiliationSelector = ".CustomField__Primary_Affiliation_ > span.value";
                     faculty = false;
                     student = false;
@@ -192,19 +208,19 @@ function ticketFix(page) {
                     alumni = false;
                     staff = false;
                     return [4 /*yield*/, page.$$(affiliationSelector)];
-                case 18:
-                    affiliationsElements = _e.sent();
-                    _e.label = 19;
-                case 19:
-                    _e.trys.push([19, 25, 26, 31]);
-                    affiliationsElements_1 = __asyncValues(affiliationsElements);
-                    _e.label = 20;
-                case 20: return [4 /*yield*/, affiliationsElements_1.next()];
                 case 21:
-                    if (!(affiliationsElements_1_1 = _e.sent(), !affiliationsElements_1_1.done)) return [3 /*break*/, 24];
+                    affiliationsElements = _e.sent();
+                    _e.label = 22;
+                case 22:
+                    _e.trys.push([22, 28, 29, 34]);
+                    affiliationsElements_1 = __asyncValues(affiliationsElements);
+                    _e.label = 23;
+                case 23: return [4 /*yield*/, affiliationsElements_1.next()];
+                case 24:
+                    if (!(affiliationsElements_1_1 = _e.sent(), !affiliationsElements_1_1.done)) return [3 /*break*/, 27];
                     affiliationsElement = affiliationsElements_1_1.value;
                     return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, affiliationsElement)];
-                case 22:
+                case 25:
                     affiliationsValue = _e.sent();
                     if (affiliationsValue.includes('faculty')) {
                         faculty = true;
@@ -221,68 +237,65 @@ function ticketFix(page) {
                     else if (affiliationsValue.includes('staff')) {
                         staff = true;
                     }
-                    _e.label = 23;
-                case 23: return [3 /*break*/, 20];
-                case 24: return [3 /*break*/, 31];
-                case 25:
+                    _e.label = 26;
+                case 26: return [3 /*break*/, 23];
+                case 27: return [3 /*break*/, 34];
+                case 28:
                     e_2_1 = _e.sent();
                     e_2 = { error: e_2_1 };
-                    return [3 /*break*/, 31];
-                case 26:
-                    _e.trys.push([26, , 29, 30]);
-                    if (!(affiliationsElements_1_1 && !affiliationsElements_1_1.done && (_b = affiliationsElements_1.return))) return [3 /*break*/, 28];
-                    return [4 /*yield*/, _b.call(affiliationsElements_1)];
-                case 27:
-                    _e.sent();
-                    _e.label = 28;
-                case 28: return [3 /*break*/, 30];
+                    return [3 /*break*/, 34];
                 case 29:
+                    _e.trys.push([29, , 32, 33]);
+                    if (!(affiliationsElements_1_1 && !affiliationsElements_1_1.done && (_b = affiliationsElements_1.return))) return [3 /*break*/, 31];
+                    return [4 /*yield*/, _b.call(affiliationsElements_1)];
+                case 30:
+                    _e.sent();
+                    _e.label = 31;
+                case 31: return [3 /*break*/, 33];
+                case 32:
                     if (e_2) throw e_2.error;
                     return [7 /*endfinally*/];
-                case 30: return [7 /*endfinally*/];
-                case 31:
+                case 33: return [7 /*endfinally*/];
+                case 34:
                     nonReedEmail = false;
                     emailSelector = ".EmailAddress > span.value";
                     return [4 /*yield*/, page.$$(emailSelector)];
-                case 32:
+                case 35:
                     emailElements = _e.sent();
                     emails = [];
-                    _e.label = 33;
-                case 33:
-                    _e.trys.push([33, 39, 40, 45]);
+                    _e.label = 36;
+                case 36:
+                    _e.trys.push([36, 42, 43, 48]);
                     emailElements_1 = __asyncValues(emailElements);
-                    _e.label = 34;
-                case 34: return [4 /*yield*/, emailElements_1.next()];
-                case 35:
-                    if (!(emailElements_1_1 = _e.sent(), !emailElements_1_1.done)) return [3 /*break*/, 38];
+                    _e.label = 37;
+                case 37: return [4 /*yield*/, emailElements_1.next()];
+                case 38:
+                    if (!(emailElements_1_1 = _e.sent(), !emailElements_1_1.done)) return [3 /*break*/, 41];
                     emailElement = emailElements_1_1.value;
                     return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, emailElement)];
-                case 36:
+                case 39:
                     emailValue = _e.sent();
                     emails.push(emailValue);
-                    if (!emailValue.includes('@reed.edu')) {
-                        nonReedEmail = true;
-                    }
-                    _e.label = 37;
-                case 37: return [3 /*break*/, 34];
-                case 38: return [3 /*break*/, 45];
-                case 39:
+                    _e.label = 40;
+                case 40: return [3 /*break*/, 37];
+                case 41: return [3 /*break*/, 48];
+                case 42:
                     e_3_1 = _e.sent();
                     e_3 = { error: e_3_1 };
-                    return [3 /*break*/, 45];
-                case 40:
-                    _e.trys.push([40, , 43, 44]);
-                    if (!(emailElements_1_1 && !emailElements_1_1.done && (_c = emailElements_1.return))) return [3 /*break*/, 42];
-                    return [4 /*yield*/, _c.call(emailElements_1)];
-                case 41:
-                    _e.sent();
-                    _e.label = 42;
-                case 42: return [3 /*break*/, 44];
+                    return [3 /*break*/, 48];
                 case 43:
+                    _e.trys.push([43, , 46, 47]);
+                    if (!(emailElements_1_1 && !emailElements_1_1.done && (_c = emailElements_1.return))) return [3 /*break*/, 45];
+                    return [4 /*yield*/, _c.call(emailElements_1)];
+                case 44:
+                    _e.sent();
+                    _e.label = 45;
+                case 45: return [3 /*break*/, 47];
+                case 46:
                     if (e_3) throw e_3.error;
                     return [7 /*endfinally*/];
-                case 44: return [7 /*endfinally*/];
-                case 45:
+                case 47: return [7 /*endfinally*/];
+                case 48:
                     if (!emeritus && !student && !affiliate && !alumni && !staff && !faculty && !emails.toString().includes('@reed.edu')) {
                         nonReedEmail = true;
                     }
@@ -308,55 +321,55 @@ function ticketFix(page) {
                     ticketHistorySelector = "div.history-container > div.message" //only add it if it's a comment, correspondance, or the initial ticket opening. we don't want others, esp "Support Tags xyz deleted" which could falsely re-trigger the regex for that tag. message class is only transaction we're interested in
                     ;
                     return [4 /*yield*/, page.waitForSelector(ticketHistorySelector)];
-                case 46:
+                case 49:
                     _e.sent();
                     return [4 /*yield*/, page.$$(ticketHistorySelector)];
-                case 47:
-                    emailStanzas = _e.sent();
-                    _e.label = 48;
-                case 48:
-                    _e.trys.push([48, 54, 55, 60]);
-                    emailStanzas_1 = __asyncValues(emailStanzas);
-                    _e.label = 49;
-                case 49: return [4 /*yield*/, emailStanzas_1.next()];
                 case 50:
-                    if (!(emailStanzas_1_1 = _e.sent(), !emailStanzas_1_1.done)) return [3 /*break*/, 53];
+                    emailStanzas = _e.sent();
+                    _e.label = 51;
+                case 51:
+                    _e.trys.push([51, 57, 58, 63]);
+                    emailStanzas_1 = __asyncValues(emailStanzas);
+                    _e.label = 52;
+                case 52: return [4 /*yield*/, emailStanzas_1.next()];
+                case 53:
+                    if (!(emailStanzas_1_1 = _e.sent(), !emailStanzas_1_1.done)) return [3 /*break*/, 56];
                     emailStanza = emailStanzas_1_1.value;
                     return [4 /*yield*/, page.evaluate(function (el) { return el.innerText; }, emailStanza)]; //this gives proper spacing after changing textContent to innerText
-                case 51:
+                case 54:
                     emailValue = _e.sent() //this gives proper spacing after changing textContent to innerText
                     ;
                     messages += emailValue + '\n';
-                    _e.label = 52;
-                case 52: return [3 /*break*/, 49];
-                case 53: return [3 /*break*/, 60];
-                case 54:
+                    _e.label = 55;
+                case 55: return [3 /*break*/, 52];
+                case 56: return [3 /*break*/, 63];
+                case 57:
                     e_4_1 = _e.sent();
                     e_4 = { error: e_4_1 };
-                    return [3 /*break*/, 60];
-                case 55:
-                    _e.trys.push([55, , 58, 59]);
-                    if (!(emailStanzas_1_1 && !emailStanzas_1_1.done && (_d = emailStanzas_1.return))) return [3 /*break*/, 57];
-                    return [4 /*yield*/, _d.call(emailStanzas_1)];
-                case 56:
-                    _e.sent();
-                    _e.label = 57;
-                case 57: return [3 /*break*/, 59];
+                    return [3 /*break*/, 63];
                 case 58:
+                    _e.trys.push([58, , 61, 62]);
+                    if (!(emailStanzas_1_1 && !emailStanzas_1_1.done && (_d = emailStanzas_1.return))) return [3 /*break*/, 60];
+                    return [4 /*yield*/, _d.call(emailStanzas_1)];
+                case 59:
+                    _e.sent();
+                    _e.label = 60;
+                case 60: return [3 /*break*/, 62];
+                case 61:
                     if (e_4) throw e_4.error;
                     return [7 /*endfinally*/];
-                case 59: return [7 /*endfinally*/];
-                case 60:
+                case 62: return [7 /*endfinally*/];
+                case 63:
                     messages = messages.replace(reg.cusAutoReplyRegex, '');
                     messages += emails + '\n'; //putting the email values in messages to simplify search
                     return [4 /*yield*/, page.waitForSelector('#header > h1')]; //title of ticket
-                case 61:
+                case 64:
                     _e.sent(); //title of ticket
                     return [4 /*yield*/, page.$('#header > h1')];
-                case 62:
+                case 65:
                     ticketTitleElement = _e.sent();
                     return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, ticketTitleElement)];
-                case 63:
+                case 66:
                     ticketTitleValue = _e.sent();
                     messages += ticketTitleValue + '\n';
                     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
@@ -370,6 +383,7 @@ function ticketFix(page) {
                         noTag = true;
                     } //no tag, this is the "Notification of Staff Hire" emails
                     else if (ticketTitleValue.includes('Welcome to Reed College | Notes for your first day of work')) {
+                        noTag = true;
                     } //no tag https://help.reed.edu/Ticket/Display.html?id=347871
                     else if (ticketTitleValue.includes('Welcome to Reed College')) {
                         noTag = true;
@@ -444,6 +458,9 @@ function ticketFix(page) {
                     }
                     else if (ticketTitleValue.includes('Google Group')) {
                         googleGroup = true;
+                    }
+                    else if (emails.toString().includes('email-alias-request@reed.edu')) {
+                        reedAccounts = true;
                     }
                     else {
                         googleDriveMatch = reg.googleDriveRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noGoogleDriveRegexList.some(function (rx) { return rx.test(messages); });
@@ -528,190 +545,270 @@ function ticketFix(page) {
                     } //end of else regex section
                     currURL = page.url();
                     modifyURL = currURL.replace('Display', 'Modify');
-                    return [4 /*yield*/, page.goto(modifyURL)];
-                case 64:
+                    return [4 /*yield*/, page.goto(modifyURL)
+                        //checks if in t-watch or cus queue; other queues will probably MOSTLY work but I haven't tested so I'm excluding
+                    ];
+                case 67:
                     _e.sent();
-                    console.log('Current Ticket: ' + page.url());
                     return [4 /*yield*/, page.$$("select.select-queue")];
-                case 65:
+                case 68:
                     queue = _e.sent();
                     return [4 /*yield*/, page.evaluate(function (q) { return q.value; }, queue[1])];
-                case 66:
+                case 69:
                     queueValue = _e.sent();
                     if (queueValue != 4 && queueValue != 11) {
                         console.log('Not CUS or TWatch Queue' + ' ' + queueValue);
                         process.exit(); //ends entire script
                     }
-                    return [4 /*yield*/, page.$("input[value=\"google drive\"]")];
-                case 67:
-                    googleDriveCheckbox = _e.sent();
-                    return [4 /*yield*/, googleDriveCheckbox.getProperty('checked')];
-                case 68: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 69:
-                    googleDriveChecked = _e.sent();
-                    if (googleDrive != googleDriveChecked) {
-                        console.log('Algo Google Drive: ' + googleDrive + 'Ticket Google Drive: ' + googleDriveChecked);
+                    //comparison code; no longer needed
+                    // const googleDriveCheckbox = await page.$(`input[value="google drive"]`)
+                    // const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue()
+                    // if (googleDrive != googleDriveChecked) {
+                    //   console.log('Algo Google Drive: ' + googleDrive + 'Ticket Google Drive: ' + googleDriveChecked)
+                    // }
+                    //
+                    // const googleGroupCheckbox = await page.$(`input[value="google group"]`)
+                    // const googleGroupChecked = await (await googleGroupCheckbox.getProperty('checked')).jsonValue()
+                    // if (googleGroup != googleGroupChecked) {
+                    //   console.log('Algo Google Group: ' + googleGroup + 'Ticket Google Group: ' + googleGroupChecked)
+                    // }
+                    //
+                    // const hardwareCheckbox = await page.$(`input[value="hardware"]`)
+                    // const hardwareChecked = await (await hardwareCheckbox.getProperty('checked')).jsonValue()
+                    // if (hardware != hardwareChecked) {
+                    //   console.log('Algo Hardware: ' + hardware + 'Ticket Hardware: ' + hardwareChecked)
+                    // }
+                    //
+                    // const libraryRelatedCheckbox = await page.$(`input[value="library related"]`)
+                    // const libraryRelatedChecked = await (await libraryRelatedCheckbox.getProperty('checked')).jsonValue()
+                    // if (libraryRelated != libraryRelatedChecked) {
+                    //   console.log('Algo LibraryRelated: ' + libraryRelated + 'Ticket LibraryRelated: ' + libraryRelatedChecked)
+                    // }
+                    //
+                    // const massEmailCheckbox = await page.$(`input[value="mass email"]`)
+                    // const massEmailChecked = await (await massEmailCheckbox.getProperty('checked')).jsonValue()
+                    // if (massEmail != massEmailChecked) {
+                    //   console.log('Algo massEmail: ' + massEmail + 'Ticket massEmail: ' + massEmailChecked)
+                    // }
+                    //
+                    // const microsoftCheckbox = await page.$(`input[value="microsoft"]`)
+                    // const microsoftChecked = await (await microsoftCheckbox.getProperty('checked')).jsonValue()
+                    // if (microsoft != microsoftChecked) {
+                    //   console.log('Algo microsoft: ' + microsoft + 'Ticket microsoft: ' + microsoftChecked)
+                    //   for (let i = 0; i < reg.microsoftRegexList.length; i++) {
+                    //     console.log(reg.microsoftRegexList[i].exec(messages))
+                    //   }
+                    // }
+                    //
+                    // const networkCheckbox = await page.$(`input[value="network"]`)
+                    // const networkChecked = await (await networkCheckbox.getProperty('checked')).jsonValue()
+                    // if (network != networkChecked) {
+                    //   console.log('Algo network: ' + network + 'Ticket network: ' + networkChecked)
+                    // }
+                    //
+                    // const passwordResetCheckbox = await page.$(`input[value="password reset"]`)
+                    // const passwordResetChecked = await (await passwordResetCheckbox.getProperty('checked')).jsonValue()
+                    // if (passwordReset != passwordResetChecked) {
+                    //   console.log('Algo passwordReset: ' + passwordReset + 'Ticket passwordReset: ' + passwordResetChecked)
+                    // }
+                    //
+                    // const phishCheckbox = await page.$(`input[value="phish report/fwd"]`)
+                    // const phishChecked = await (await phishCheckbox.getProperty('checked')).jsonValue()
+                    // if (phish != phishChecked) {
+                    //   console.log('Algo phish: ' + phish + 'Ticket phish: ' + phishChecked)
+                    // }
+                    //
+                    // const printingCheckbox = await page.$(`input[value="printers/copiers"]`)
+                    // const printingChecked = await (await printingCheckbox.getProperty('checked')).jsonValue()
+                    // if (printing != printingChecked) {
+                    //   console.log('Algo printing: ' + printing + 'Ticket printing: ' + printingChecked)
+                    // }
+                    //
+                    // const reedAccountsCheckbox = await page.$(`input[value="reed accounts & access"]`)
+                    // const reedAccountsChecked = await (await reedAccountsCheckbox.getProperty('checked')).jsonValue()
+                    // if (reedAccounts != reedAccountsChecked) {
+                    //   console.log('Algo reedAccounts: ' + reedAccounts + 'Ticket reedAccounts: ' + reedAccountsChecked)
+                    // }
+                    //
+                    // const softwareCheckbox = await page.$(`input[value="software"]`)
+                    // const softwareChecked = await (await softwareCheckbox.getProperty('checked')).jsonValue()
+                    // if (software != softwareChecked) {
+                    //   console.log('Algo software: ' + software + 'Ticket software: ' + softwareChecked)
+                    //   for (let i = 0; i < reg.softwareRegexList.length; i++) {
+                    //     console.log(reg.softwareRegexList[i].exec(messages))
+                    //   }
+                    // }
+                    //
+                    // const thesisCheckbox = await page.$(`input[value="thesis"]`)
+                    // const thesisChecked = await (await thesisCheckbox.getProperty('checked')).jsonValue()
+                    // if (thesis != thesisChecked) {
+                    //   console.log('Algo thesis: ' + thesis + 'Ticket thesis: ' + thesisChecked)
+                    // }
+                    //
+                    // const twoFactorCheckbox = await page.$(`input[value="two-factor"]`)
+                    // const twoFactorChecked = await (await twoFactorCheckbox.getProperty('checked')).jsonValue()
+                    // if (twoFactor != twoFactorChecked) {
+                    //   console.log('Algo twoFactor: ' + twoFactor + 'Ticket twoFactor: ' + twoFactorChecked)
+                    // }
+                    //
+                    // const nameChangeCheckbox = await page.$(`input[value="user/name change"]`)
+                    // const nameChangeChecked = await (await nameChangeCheckbox.getProperty('checked')).jsonValue()
+                    // if (nameChange != nameChangeChecked) {
+                    //   console.log('Algo nameChange: ' + nameChange + 'Ticket nameChange: ' + nameChangeChecked)
+                    // }
+                    //
+                    // const virusMalwareCheckbox = await page.$(`input[value="virus/malware"]`)
+                    // const virusMalwareChecked = await (await virusMalwareCheckbox.getProperty('checked')).jsonValue()
+                    // if (virusMalware != virusMalwareChecked) {
+                    //   console.log('Algo virusMalware: ' + virusMalware + 'Ticket virusMalware: ' + virusMalwareChecked)
+                    // }
+                    //console.log('End')
+                    if (emeritus) {
+                        if (faculty) {
+                            checkSpecificBox(page, 'emeritus/emerita');
+                            checkSpecificBox(page, 'faculty');
+                        }
+                        else if (staff) {
+                            checkSpecificBox(page, 'emeritus/emerita');
+                            checkSpecificBox(page, 'staff');
+                        }
                     }
-                    return [4 /*yield*/, page.$("input[value=\"google group\"]")];
+                    else if (student) {
+                        checkSpecificBox(page, 'student');
+                        //if(affiliate){checkSpecificBox(page,"affiliate")}
+                    }
+                    else if (alumni) {
+                        checkSpecificBox(page, 'alumni');
+                        //if(faculty){checkSpecificBox(page,"faculty")}
+                        //if(staff){checkSpecificBox(page,"staff")}
+                        //if(affiliate){checkSpecificBox(page,"affiliate")}
+                    }
+                    else if (faculty) {
+                        checkSpecificBox(page, 'faculty');
+                    }
+                    else if (staff) {
+                        checkSpecificBox(page, 'staff');
+                    }
+                    else if (affiliate) {
+                        checkSpecificBox(page, 'affiliate');
+                    }
+                    else if (nonReedEmail && (ticketTitleValue.includes('applicant') || ticketTitleValue.includes('Applicant'))) {
+                        console.log('FLAG Possible Applicant: ' + modifyURL);
+                    }
+                    //SUPPORT TAGS CHECKING BOXES
+                    if (googleDrive) {
+                        checkSpecificBox(page, 'google drive');
+                    }
+                    if (googleGroup) {
+                        checkSpecificBox(page, 'google group');
+                    }
+                    if (hardware) {
+                        checkSpecificBox(page, 'hardware');
+                    }
+                    if (libraryRelated) {
+                        checkSpecificBox(page, 'library related');
+                    }
+                    if (massEmail) {
+                        checkSpecificBox(page, 'mass email');
+                    }
+                    if (microsoft) {
+                        checkSpecificBox(page, 'microsoft');
+                    }
+                    if (network) {
+                        checkSpecificBox(page, 'network');
+                    }
+                    if (passwordReset) {
+                        checkSpecificBox(page, 'password reset');
+                    }
+                    if (phish) {
+                        checkSpecificBox(page, 'phish report/fwd');
+                    }
+                    if (printing) {
+                        checkSpecificBox(page, 'printers/copiers');
+                    }
+                    if (reedAccounts) {
+                        checkSpecificBox(page, 'reed accounts & access');
+                    }
+                    if (software) {
+                        checkSpecificBox(page, 'software');
+                    }
+                    if (thesis) {
+                        checkSpecificBox(page, 'thesis');
+                    }
+                    if (twoFactor) {
+                        checkSpecificBox(page, 'two-factor');
+                    }
+                    if (nameChange) {
+                        checkSpecificBox(page, 'user/name change');
+                    }
+                    if (virusMalware) {
+                        checkSpecificBox(page, 'virus/malware');
+                    }
+                    //presses submit
+                    return [4 /*yield*/, page.click('#TicketModify > div.submit > div.buttons > input')
+                        //process.abort() //exit() kills the script too soon, only abort works for some reason!
+                    ];
                 case 70:
-                    googleGroupCheckbox = _e.sent();
-                    return [4 /*yield*/, googleGroupCheckbox.getProperty('checked')];
-                case 71: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 72:
-                    googleGroupChecked = _e.sent();
-                    if (googleGroup != googleGroupChecked) {
-                        console.log('Algo Google Group: ' + googleGroup + 'Ticket Google Group: ' + googleGroupChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"hardware\"]")];
-                case 73:
-                    hardwareCheckbox = _e.sent();
-                    return [4 /*yield*/, hardwareCheckbox.getProperty('checked')];
-                case 74: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 75:
-                    hardwareChecked = _e.sent();
-                    if (hardware != hardwareChecked) {
-                        console.log('Algo Hardware: ' + hardware + 'Ticket Hardware: ' + hardwareChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"library related\"]")];
-                case 76:
-                    libraryRelatedCheckbox = _e.sent();
-                    return [4 /*yield*/, libraryRelatedCheckbox.getProperty('checked')];
-                case 77: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 78:
-                    libraryRelatedChecked = _e.sent();
-                    if (libraryRelated != libraryRelatedChecked) {
-                        console.log('Algo LibraryRelated: ' + libraryRelated + 'Ticket LibraryRelated: ' + libraryRelatedChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"mass email\"]")];
-                case 79:
-                    massEmailCheckbox = _e.sent();
-                    return [4 /*yield*/, massEmailCheckbox.getProperty('checked')];
-                case 80: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 81:
-                    massEmailChecked = _e.sent();
-                    if (massEmail != massEmailChecked) {
-                        console.log('Algo massEmail: ' + massEmail + 'Ticket massEmail: ' + massEmailChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"microsoft\"]")];
-                case 82:
-                    microsoftCheckbox = _e.sent();
-                    return [4 /*yield*/, microsoftCheckbox.getProperty('checked')];
-                case 83: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 84:
-                    microsoftChecked = _e.sent();
-                    if (microsoft != microsoftChecked) {
-                        console.log('Algo microsoft: ' + microsoft + 'Ticket microsoft: ' + microsoftChecked);
-                        for (i = 0; i < reg.microsoftRegexList.length; i++) {
-                            console.log(reg.microsoftRegexList[i].exec(messages));
-                        }
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"network\"]")];
-                case 85:
-                    networkCheckbox = _e.sent();
-                    return [4 /*yield*/, networkCheckbox.getProperty('checked')];
-                case 86: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 87:
-                    networkChecked = _e.sent();
-                    if (network != networkChecked) {
-                        console.log('Algo network: ' + network + 'Ticket network: ' + networkChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"password reset\"]")];
-                case 88:
-                    passwordResetCheckbox = _e.sent();
-                    return [4 /*yield*/, passwordResetCheckbox.getProperty('checked')];
-                case 89: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 90:
-                    passwordResetChecked = _e.sent();
-                    if (passwordReset != passwordResetChecked) {
-                        console.log('Algo passwordReset: ' + passwordReset + 'Ticket passwordReset: ' + passwordResetChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"phish report/fwd\"]")];
-                case 91:
-                    phishCheckbox = _e.sent();
-                    return [4 /*yield*/, phishCheckbox.getProperty('checked')];
-                case 92: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 93:
-                    phishChecked = _e.sent();
-                    if (phish != phishChecked) {
-                        console.log('Algo phish: ' + phish + 'Ticket phish: ' + phishChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"printers/copiers\"]")];
-                case 94:
-                    printingCheckbox = _e.sent();
-                    return [4 /*yield*/, printingCheckbox.getProperty('checked')];
-                case 95: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 96:
-                    printingChecked = _e.sent();
-                    if (printing != printingChecked) {
-                        console.log('Algo printing: ' + printing + 'Ticket printing: ' + printingChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"reed accounts & access\"]")];
-                case 97:
-                    reedAccountsCheckbox = _e.sent();
-                    return [4 /*yield*/, reedAccountsCheckbox.getProperty('checked')];
-                case 98: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 99:
-                    reedAccountsChecked = _e.sent();
-                    if (reedAccounts != reedAccountsChecked) {
-                        console.log('Algo reedAccounts: ' + reedAccounts + 'Ticket reedAccounts: ' + reedAccountsChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"software\"]")];
-                case 100:
-                    softwareCheckbox = _e.sent();
-                    return [4 /*yield*/, softwareCheckbox.getProperty('checked')];
-                case 101: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 102:
-                    softwareChecked = _e.sent();
-                    if (software != softwareChecked) {
-                        console.log('Algo software: ' + software + 'Ticket software: ' + softwareChecked);
-                        for (i = 0; i < reg.softwareRegexList.length; i++) {
-                            console.log(reg.softwareRegexList[i].exec(messages));
-                        }
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"thesis\"]")];
-                case 103:
-                    thesisCheckbox = _e.sent();
-                    return [4 /*yield*/, thesisCheckbox.getProperty('checked')];
-                case 104: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 105:
-                    thesisChecked = _e.sent();
-                    if (thesis != thesisChecked) {
-                        console.log('Algo thesis: ' + thesis + 'Ticket thesis: ' + thesisChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"two-factor\"]")];
-                case 106:
-                    twoFactorCheckbox = _e.sent();
-                    return [4 /*yield*/, twoFactorCheckbox.getProperty('checked')];
-                case 107: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 108:
-                    twoFactorChecked = _e.sent();
-                    if (twoFactor != twoFactorChecked) {
-                        console.log('Algo twoFactor: ' + twoFactor + 'Ticket twoFactor: ' + twoFactorChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"user/name change\"]")];
-                case 109:
-                    nameChangeCheckbox = _e.sent();
-                    return [4 /*yield*/, nameChangeCheckbox.getProperty('checked')];
-                case 110: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 111:
-                    nameChangeChecked = _e.sent();
-                    if (nameChange != nameChangeChecked) {
-                        console.log('Algo nameChange: ' + nameChange + 'Ticket nameChange: ' + nameChangeChecked);
-                    }
-                    return [4 /*yield*/, page.$("input[value=\"virus/malware\"]")];
-                case 112:
-                    virusMalwareCheckbox = _e.sent();
-                    return [4 /*yield*/, virusMalwareCheckbox.getProperty('checked')];
-                case 113: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 114:
-                    virusMalwareChecked = _e.sent();
-                    if (virusMalware != virusMalwareChecked) {
-                        console.log('Algo virusMalware: ' + virusMalware + 'Ticket virusMalware: ' + virusMalwareChecked);
-                    }
-                    console.log('End');
+                    //presses submit
+                    _e.sent();
                     return [2 /*return*/];
             }
         });
     });
 }
-run();
+;
+(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var browser, page, tickets, _a, _b, _i, ticket;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0: return [4 /*yield*/, puppeteer.launch({ headless: true })];
+            case 1:
+                browser = _c.sent();
+                return [4 /*yield*/, browser.pages()];
+            case 2:
+                page = (_c.sent())[0];
+                return [4 /*yield*/, page.goto(reedLoginURL + searchURL)];
+            case 3:
+                _c.sent();
+                return [4 /*yield*/, page.type('[name="login"]', login)];
+            case 4:
+                _c.sent();
+                return [4 /*yield*/, page.type('[name="password"]', pw)];
+            case 5:
+                _c.sent();
+                return [4 /*yield*/, page.click("button[class=\"btn btn-primary pull-right\"]")
+                    //wait for page load. (no network requests for 5 seconds, that's super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
+                ];
+            case 6:
+                _c.sent();
+                //wait for page load. (no network requests for 5 seconds, that's super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
+                return [4 /*yield*/, page.waitForNetworkIdle({ idleTime: 5000 })];
+            case 7:
+                //wait for page load. (no network requests for 5 seconds, that's super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
+                _c.sent();
+                return [4 /*yield*/, page.$$eval("tbody.list-item", function (el) { return el.map(function (x) { return x.getAttribute('data-record-id'); }); })];
+            case 8:
+                tickets = _c.sent();
+                _a = [];
+                for (_b in tickets)
+                    _a.push(_b);
+                _i = 0;
+                _c.label = 9;
+            case 9:
+                if (!(_i < _a.length)) return [3 /*break*/, 12];
+                ticket = _a[_i];
+                console.log(tickets[ticket]);
+                return [4 /*yield*/, run(tickets[ticket])];
+            case 10:
+                _c.sent();
+                _c.label = 11;
+            case 11:
+                _i++;
+                return [3 /*break*/, 9];
+            case 12: return [4 /*yield*/, browser.close()];
+            case 13:
+                _c.sent();
+                return [2 /*return*/];
+        }
+    });
+}); })();

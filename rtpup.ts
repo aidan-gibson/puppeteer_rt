@@ -5,23 +5,25 @@ import { readFileSync } from 'fs'
 const pw = readFileSync('./password.txt', 'utf-8')
 const login = 'aigibson'
 const reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&'
-const ticketURL = 'https://help.reed.edu/Ticket/Display.html?id='
-const currentTicket = 345842 //336797
+//make sure u edit search to show unlimited rows, not just 50
+const searchURL =
+  'https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=(%20Queue%20%3D%20%27cus%27%20OR%20Queue%20%3D%20%27twatch%27%20)%20AND%20%27CF.%7BSupport%20Tags%7D%27%20IS%20NULL%20AND%20Created%20%3C%20%272022-04-01%27%20AND%20Created%20%3E%20%272022-02-28%27&RowsPerPage=0&SavedChartSearchId=new&SavedSearchId=new'
 
-async function run() {
+async function run(currentTicket) {
+  const ticketURL = 'https://help.reed.edu/Ticket/Display.html?id='
   const browser = await puppeteer.launch({
     //devtools: true, //this also forces {headless: false}
     //dumpio: true //captures all console messages to output https://stackoverflow.com/questions/47539043/how-to-get-all-console-messages-with-puppeteer-including-errors-csp-violations
   })
   //const page = await browser.newPage()
   const [page] = await browser.pages() //this fixes extra empty tab being open instead of above line
-  await page.setViewport({ width: 1692, height: 777 }) //({ width: 850, height: 800}); //doesn't matter
+  //await page.setViewport({ width: 1692, height: 777 }) //({ width: 850, height: 800}); //doesn't matter
   await page.goto(reedLoginURL + ticketURL + currentTicket)
   await page.type('[name="login"]', login)
   await page.type('[name="password"]', pw)
   await page.click(`button[class="btn btn-primary pull-right"]`)
-
-  ticketFix(page)
+  await ticketFix(page, currentTicket)
+  await browser.close()
 }
 async function checkSpecificBox(page: Page, checkBoxSelector: string): Promise<void> {
   //required, otherwise will attempt to click too soon and throw error
@@ -39,26 +41,32 @@ async function checkSpecificBox(page: Page, checkBoxSelector: string): Promise<v
   // instead of checking if checked, then clicking, I can directly set checked to true
   //await page.$eval(`input[value="google drive"]`, check => check.checked = true);
 }
-async function ticketFix(page: Page): Promise<void> {
+async function ticketFix(page: Page, currentTicket): Promise<void> {
   //click "Show all quoted text" anchor; necessary if the init ticket has "show quoted text" and we need it like here https://help.reed.edu/Ticket/Display.html?id=346157
   const quotedTextSelector = `#ticket-${currentTicket}-history > div > div.titlebox-title > span.right > a:nth-child(1)`
   await page.waitForSelector(quotedTextSelector)
   await page.click(quotedTextSelector)
 
   //TITLE EMERITUS SECTION
-  const titleSelector = `.CustomField__Title_ > span.value` //must check if there are multiple
-  await page.waitForSelector(titleSelector) //this waits for FIRST selector matching, what if the first loads faster than the second??
-  //this was from when I didn't realize there could b mult requestors
-  //let titleElement = await page.$(titleSelector);
-  //let titleValue = await page.evaluate(el => el.textContent, titleElement);
-
-  const titleElements = await page.$$(titleSelector)
   let emeritus = false
-  for await (const titleElement of titleElements) {
-    const titleValue = await page.evaluate((el) => el.textContent, titleElement)
-    if (titleValue.includes('emeritus') || titleValue.includes('Emeritus') || titleValue.includes('emerita') || titleValue.includes('Emerita')) {
-      emeritus = true
+  //it's possible there's no title field if there are no requestors
+  try {
+    const titleSelector = `.CustomField__Title_ > span.value` //must check if there are multiple
+    await page.waitForSelector(titleSelector) //this waits for FIRST selector matching, what if the first loads faster than the second??
+    //this was from when I didn't realize there could b mult requestors
+    //let titleElement = await page.$(titleSelector);
+    //let titleValue = await page.evaluate(el => el.textContent, titleElement);
+
+    const titleElements = await page.$$(titleSelector)
+
+    for await (const titleElement of titleElements) {
+      const titleValue = await page.evaluate((el) => el.textContent, titleElement)
+      if (titleValue.includes('emeritus') || titleValue.includes('Emeritus') || titleValue.includes('emerita') || titleValue.includes('Emerita')) {
+        emeritus = true
+      }
     }
+  } catch (error) {
+    console.error(error)
   }
   //console.log("Emeritus: "+emeritus);
 
@@ -94,8 +102,7 @@ async function ticketFix(page: Page): Promise<void> {
   // console.log("Student: "+student);
   // console.log("Affiliate: "+affiliate);
   // console.log("Alumni: "+alumni);
-  // console.log("Staff: "+staff);
-  //TODO let possibleApplicant: boolean
+  //console.log('Staff: ' + staff)
 
   //EMAIL CHECK SECTION
   let nonReedEmail = false
@@ -105,9 +112,6 @@ async function ticketFix(page: Page): Promise<void> {
   for await (const emailElement of emailElements) {
     const emailValue = await page.evaluate((el) => el.textContent, emailElement)
     emails.push(emailValue)
-    if (!emailValue.includes('@reed.edu')) {
-      nonReedEmail = true
-    }
   }
   if (!emeritus && !student && !affiliate && !alumni && !staff && !faculty && !emails.toString().includes('@reed.edu')) {
     nonReedEmail = true
@@ -161,6 +165,7 @@ async function ticketFix(page: Page): Promise<void> {
     noTag = true
   } //no tag, this is the "Notification of Staff Hire" emails
   else if (ticketTitleValue.includes('Welcome to Reed College | Notes for your first day of work')) {
+    noTag = true
   } //no tag https://help.reed.edu/Ticket/Display.html?id=347871
   else if (ticketTitleValue.includes('Welcome to Reed College')) {
     noTag = true
@@ -214,6 +219,8 @@ async function ticketFix(page: Page): Promise<void> {
     googleGroup = true
   } else if (ticketTitleValue.includes('Google Group')) {
     googleGroup = true
+  } else if (emails.toString().includes('email-alias-request@reed.edu')) {
+    reedAccounts = true
   } else {
     //regex section, only run if no hard rules found (moved regex lists outside of fnc to b global
 
@@ -300,14 +307,12 @@ async function ticketFix(page: Page): Promise<void> {
       console.log('FLAG NO REGEX MATCH ' + page.url())
     }
   } //end of else regex section
-
+  // console.log('Current Ticket: ' + page.url())
   //PAGE CHANGE
   const currURL: string = page.url()
   //replace Display with Modify
   const modifyURL: string = currURL.replace('Display', 'Modify')
   await page.goto(modifyURL)
-
-  console.log('Current Ticket: ' + page.url())
 
   //checks if in t-watch or cus queue; other queues will probably MOSTLY work but I haven't tested so I'm excluding
   const queue = await page.$$(`select.select-queue`)
@@ -316,151 +321,208 @@ async function ticketFix(page: Page): Promise<void> {
     console.log('Not CUS or TWatch Queue' + ' ' + queueValue)
     process.exit() //ends entire script
   }
-
-  const googleDriveCheckbox = await page.$(`input[value="google drive"]`)
-  const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue()
-  if (googleDrive != googleDriveChecked) {
-    console.log('Algo Google Drive: ' + googleDrive + 'Ticket Google Drive: ' + googleDriveChecked)
-  }
-
-  const googleGroupCheckbox = await page.$(`input[value="google group"]`)
-  const googleGroupChecked = await (await googleGroupCheckbox.getProperty('checked')).jsonValue()
-  if (googleGroup != googleGroupChecked) {
-    console.log('Algo Google Group: ' + googleGroup + 'Ticket Google Group: ' + googleGroupChecked)
-  }
-
-  const hardwareCheckbox = await page.$(`input[value="hardware"]`)
-  const hardwareChecked = await (await hardwareCheckbox.getProperty('checked')).jsonValue()
-  if (hardware != hardwareChecked) {
-    console.log('Algo Hardware: ' + hardware + 'Ticket Hardware: ' + hardwareChecked)
-  }
-
-  const libraryRelatedCheckbox = await page.$(`input[value="library related"]`)
-  const libraryRelatedChecked = await (await libraryRelatedCheckbox.getProperty('checked')).jsonValue()
-  if (libraryRelated != libraryRelatedChecked) {
-    console.log('Algo LibraryRelated: ' + libraryRelated + 'Ticket LibraryRelated: ' + libraryRelatedChecked)
-  }
-
-  const massEmailCheckbox = await page.$(`input[value="mass email"]`)
-  const massEmailChecked = await (await massEmailCheckbox.getProperty('checked')).jsonValue()
-  if (massEmail != massEmailChecked) {
-    console.log('Algo massEmail: ' + massEmail + 'Ticket massEmail: ' + massEmailChecked)
-  }
-
-  const microsoftCheckbox = await page.$(`input[value="microsoft"]`)
-  const microsoftChecked = await (await microsoftCheckbox.getProperty('checked')).jsonValue()
-  if (microsoft != microsoftChecked) {
-    console.log('Algo microsoft: ' + microsoft + 'Ticket microsoft: ' + microsoftChecked)
-    for (let i = 0; i < reg.microsoftRegexList.length; i++) {
-      console.log(reg.microsoftRegexList[i].exec(messages))
-    }
-  }
-
-  const networkCheckbox = await page.$(`input[value="network"]`)
-  const networkChecked = await (await networkCheckbox.getProperty('checked')).jsonValue()
-  if (network != networkChecked) {
-    console.log('Algo network: ' + network + 'Ticket network: ' + networkChecked)
-  }
-
-  const passwordResetCheckbox = await page.$(`input[value="password reset"]`)
-  const passwordResetChecked = await (await passwordResetCheckbox.getProperty('checked')).jsonValue()
-  if (passwordReset != passwordResetChecked) {
-    console.log('Algo passwordReset: ' + passwordReset + 'Ticket passwordReset: ' + passwordResetChecked)
-  }
-
-  const phishCheckbox = await page.$(`input[value="phish report/fwd"]`)
-  const phishChecked = await (await phishCheckbox.getProperty('checked')).jsonValue()
-  if (phish != phishChecked) {
-    console.log('Algo phish: ' + phish + 'Ticket phish: ' + phishChecked)
-  }
-
-  const printingCheckbox = await page.$(`input[value="printers/copiers"]`)
-  const printingChecked = await (await printingCheckbox.getProperty('checked')).jsonValue()
-  if (printing != printingChecked) {
-    console.log('Algo printing: ' + printing + 'Ticket printing: ' + printingChecked)
-  }
-
-  const reedAccountsCheckbox = await page.$(`input[value="reed accounts & access"]`)
-  const reedAccountsChecked = await (await reedAccountsCheckbox.getProperty('checked')).jsonValue()
-  if (reedAccounts != reedAccountsChecked) {
-    console.log('Algo reedAccounts: ' + reedAccounts + 'Ticket reedAccounts: ' + reedAccountsChecked)
-  }
-
-  const softwareCheckbox = await page.$(`input[value="software"]`)
-  const softwareChecked = await (await softwareCheckbox.getProperty('checked')).jsonValue()
-  if (software != softwareChecked) {
-    console.log('Algo software: ' + software + 'Ticket software: ' + softwareChecked)
-    for (let i = 0; i < reg.softwareRegexList.length; i++) {
-      console.log(reg.softwareRegexList[i].exec(messages))
-    }
-  }
-
-  const thesisCheckbox = await page.$(`input[value="thesis"]`)
-  const thesisChecked = await (await thesisCheckbox.getProperty('checked')).jsonValue()
-  if (thesis != thesisChecked) {
-    console.log('Algo thesis: ' + thesis + 'Ticket thesis: ' + thesisChecked)
-  }
-
-  const twoFactorCheckbox = await page.$(`input[value="two-factor"]`)
-  const twoFactorChecked = await (await twoFactorCheckbox.getProperty('checked')).jsonValue()
-  if (twoFactor != twoFactorChecked) {
-    console.log('Algo twoFactor: ' + twoFactor + 'Ticket twoFactor: ' + twoFactorChecked)
-  }
-
-  const nameChangeCheckbox = await page.$(`input[value="user/name change"]`)
-  const nameChangeChecked = await (await nameChangeCheckbox.getProperty('checked')).jsonValue()
-  if (nameChange != nameChangeChecked) {
-    console.log('Algo nameChange: ' + nameChange + 'Ticket nameChange: ' + nameChangeChecked)
-  }
-
-  const virusMalwareCheckbox = await page.$(`input[value="virus/malware"]`)
-  const virusMalwareChecked = await (await virusMalwareCheckbox.getProperty('checked')).jsonValue()
-  if (virusMalware != virusMalwareChecked) {
-    console.log('Algo virusMalware: ' + virusMalware + 'Ticket virusMalware: ' + virusMalwareChecked)
-  }
-
-  console.log('End')
-
+  //comparison code; no longer needed
+  // const googleDriveCheckbox = await page.$(`input[value="google drive"]`)
+  // const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue()
+  // if (googleDrive != googleDriveChecked) {
+  //   console.log('Algo Google Drive: ' + googleDrive + 'Ticket Google Drive: ' + googleDriveChecked)
+  // }
   //
-  // if (emeritus){
-  //     if (faculty){checkSpecificBox(page,"emeritus/emerita");checkSpecificBox(page,"faculty");}
-  //     else if(staff){checkSpecificBox(page,"emeritus/emerita");checkSpecificBox(page,"staff");}
+  // const googleGroupCheckbox = await page.$(`input[value="google group"]`)
+  // const googleGroupChecked = await (await googleGroupCheckbox.getProperty('checked')).jsonValue()
+  // if (googleGroup != googleGroupChecked) {
+  //   console.log('Algo Google Group: ' + googleGroup + 'Ticket Google Group: ' + googleGroupChecked)
   // }
-  // else if(student){
-  //     checkSpecificBox(page,"student");
-  //     //if(affiliate){checkSpecificBox(page,"affiliate")}
-  // }
-  // else if(alumni){
-  //     checkSpecificBox(page,"alumni");
-  //     //if(faculty){checkSpecificBox(page,"faculty")}
-  //     //if(staff){checkSpecificBox(page,"staff")}
-  //     //if(affiliate){checkSpecificBox(page,"affiliate")}
-  // }
-  // else if(faculty){checkSpecificBox(page,"faculty")}
-  // else if(staff){checkSpecificBox(page,"staff")}
-  // else if(affiliate){checkSpecificBox(page,"affiliate")}
-  // else if(nonReedEmail){console.log("FLAG Possible Prospie: "+modifyURL)}//TODO add to an array to print at end or console.log it or smth
   //
-  // //SUPPORT TAGS CHECKING BOXES
-  // if(googleDrive){checkSpecificBox(page,"google drive")}
-  // if(googleGroup){checkSpecificBox(page,"google group")}
-  // if(hardware){checkSpecificBox(page,"hardware")}
-  // if(libraryRelated){checkSpecificBox(page,"library related")}
-  // if(massEmail){checkSpecificBox(page,"mass email")}
-  // if(microsoft){checkSpecificBox(page, "microsoft")}
-  // if(network){checkSpecificBox(page,"network")}
-  // if(passwordReset){checkSpecificBox(page,"password reset")}
-  // if(phish){checkSpecificBox(page,"phish report/fwd")}
-  // if(printing){checkSpecificBox(page,"printers/copiers")}
-  // if(reedAccounts){checkSpecificBox(page,"reed accounts & access")}
-  // if(software){checkSpecificBox(page, "software")}
-  // if(thesis){checkSpecificBox(page,"thesis")}
-  // if(twoFactor){checkSpecificBox(page,"two-factor")}
-  // if(nameChange){checkSpecificBox(page,"user/name change")}
-  // if(virusMalware){checkSpecificBox(page,"virus/malware")}
+  // const hardwareCheckbox = await page.$(`input[value="hardware"]`)
+  // const hardwareChecked = await (await hardwareCheckbox.getProperty('checked')).jsonValue()
+  // if (hardware != hardwareChecked) {
+  //   console.log('Algo Hardware: ' + hardware + 'Ticket Hardware: ' + hardwareChecked)
+  // }
+  //
+  // const libraryRelatedCheckbox = await page.$(`input[value="library related"]`)
+  // const libraryRelatedChecked = await (await libraryRelatedCheckbox.getProperty('checked')).jsonValue()
+  // if (libraryRelated != libraryRelatedChecked) {
+  //   console.log('Algo LibraryRelated: ' + libraryRelated + 'Ticket LibraryRelated: ' + libraryRelatedChecked)
+  // }
+  //
+  // const massEmailCheckbox = await page.$(`input[value="mass email"]`)
+  // const massEmailChecked = await (await massEmailCheckbox.getProperty('checked')).jsonValue()
+  // if (massEmail != massEmailChecked) {
+  //   console.log('Algo massEmail: ' + massEmail + 'Ticket massEmail: ' + massEmailChecked)
+  // }
+  //
+  // const microsoftCheckbox = await page.$(`input[value="microsoft"]`)
+  // const microsoftChecked = await (await microsoftCheckbox.getProperty('checked')).jsonValue()
+  // if (microsoft != microsoftChecked) {
+  //   console.log('Algo microsoft: ' + microsoft + 'Ticket microsoft: ' + microsoftChecked)
+  //   for (let i = 0; i < reg.microsoftRegexList.length; i++) {
+  //     console.log(reg.microsoftRegexList[i].exec(messages))
+  //   }
+  // }
+  //
+  // const networkCheckbox = await page.$(`input[value="network"]`)
+  // const networkChecked = await (await networkCheckbox.getProperty('checked')).jsonValue()
+  // if (network != networkChecked) {
+  //   console.log('Algo network: ' + network + 'Ticket network: ' + networkChecked)
+  // }
+  //
+  // const passwordResetCheckbox = await page.$(`input[value="password reset"]`)
+  // const passwordResetChecked = await (await passwordResetCheckbox.getProperty('checked')).jsonValue()
+  // if (passwordReset != passwordResetChecked) {
+  //   console.log('Algo passwordReset: ' + passwordReset + 'Ticket passwordReset: ' + passwordResetChecked)
+  // }
+  //
+  // const phishCheckbox = await page.$(`input[value="phish report/fwd"]`)
+  // const phishChecked = await (await phishCheckbox.getProperty('checked')).jsonValue()
+  // if (phish != phishChecked) {
+  //   console.log('Algo phish: ' + phish + 'Ticket phish: ' + phishChecked)
+  // }
+  //
+  // const printingCheckbox = await page.$(`input[value="printers/copiers"]`)
+  // const printingChecked = await (await printingCheckbox.getProperty('checked')).jsonValue()
+  // if (printing != printingChecked) {
+  //   console.log('Algo printing: ' + printing + 'Ticket printing: ' + printingChecked)
+  // }
+  //
+  // const reedAccountsCheckbox = await page.$(`input[value="reed accounts & access"]`)
+  // const reedAccountsChecked = await (await reedAccountsCheckbox.getProperty('checked')).jsonValue()
+  // if (reedAccounts != reedAccountsChecked) {
+  //   console.log('Algo reedAccounts: ' + reedAccounts + 'Ticket reedAccounts: ' + reedAccountsChecked)
+  // }
+  //
+  // const softwareCheckbox = await page.$(`input[value="software"]`)
+  // const softwareChecked = await (await softwareCheckbox.getProperty('checked')).jsonValue()
+  // if (software != softwareChecked) {
+  //   console.log('Algo software: ' + software + 'Ticket software: ' + softwareChecked)
+  //   for (let i = 0; i < reg.softwareRegexList.length; i++) {
+  //     console.log(reg.softwareRegexList[i].exec(messages))
+  //   }
+  // }
+  //
+  // const thesisCheckbox = await page.$(`input[value="thesis"]`)
+  // const thesisChecked = await (await thesisCheckbox.getProperty('checked')).jsonValue()
+  // if (thesis != thesisChecked) {
+  //   console.log('Algo thesis: ' + thesis + 'Ticket thesis: ' + thesisChecked)
+  // }
+  //
+  // const twoFactorCheckbox = await page.$(`input[value="two-factor"]`)
+  // const twoFactorChecked = await (await twoFactorCheckbox.getProperty('checked')).jsonValue()
+  // if (twoFactor != twoFactorChecked) {
+  //   console.log('Algo twoFactor: ' + twoFactor + 'Ticket twoFactor: ' + twoFactorChecked)
+  // }
+  //
+  // const nameChangeCheckbox = await page.$(`input[value="user/name change"]`)
+  // const nameChangeChecked = await (await nameChangeCheckbox.getProperty('checked')).jsonValue()
+  // if (nameChange != nameChangeChecked) {
+  //   console.log('Algo nameChange: ' + nameChange + 'Ticket nameChange: ' + nameChangeChecked)
+  // }
+  //
+  // const virusMalwareCheckbox = await page.$(`input[value="virus/malware"]`)
+  // const virusMalwareChecked = await (await virusMalwareCheckbox.getProperty('checked')).jsonValue()
+  // if (virusMalware != virusMalwareChecked) {
+  //   console.log('Algo virusMalware: ' + virusMalware + 'Ticket virusMalware: ' + virusMalwareChecked)
+  // }
+  //console.log('End')
+
+  if (emeritus) {
+    if (faculty) {
+      checkSpecificBox(page, 'emeritus/emerita')
+      checkSpecificBox(page, 'faculty')
+    } else if (staff) {
+      checkSpecificBox(page, 'emeritus/emerita')
+      checkSpecificBox(page, 'staff')
+    }
+  } else if (student) {
+    checkSpecificBox(page, 'student')
+    //if(affiliate){checkSpecificBox(page,"affiliate")}
+  } else if (alumni) {
+    checkSpecificBox(page, 'alumni')
+    //if(faculty){checkSpecificBox(page,"faculty")}
+    //if(staff){checkSpecificBox(page,"staff")}
+    //if(affiliate){checkSpecificBox(page,"affiliate")}
+  } else if (faculty) {
+    checkSpecificBox(page, 'faculty')
+  } else if (staff) {
+    checkSpecificBox(page, 'staff')
+  } else if (affiliate) {
+    checkSpecificBox(page, 'affiliate')
+  } else if (nonReedEmail && (ticketTitleValue.includes('applicant') || ticketTitleValue.includes('Applicant'))) {
+    console.log('FLAG Possible Applicant: ' + modifyURL)
+  }
+
+  //SUPPORT TAGS CHECKING BOXES
+  if (googleDrive) {
+    checkSpecificBox(page, 'google drive')
+  }
+  if (googleGroup) {
+    checkSpecificBox(page, 'google group')
+  }
+  if (hardware) {
+    checkSpecificBox(page, 'hardware')
+  }
+  if (libraryRelated) {
+    checkSpecificBox(page, 'library related')
+  }
+  if (massEmail) {
+    checkSpecificBox(page, 'mass email')
+  }
+  if (microsoft) {
+    checkSpecificBox(page, 'microsoft')
+  }
+  if (network) {
+    checkSpecificBox(page, 'network')
+  }
+  if (passwordReset) {
+    checkSpecificBox(page, 'password reset')
+  }
+  if (phish) {
+    checkSpecificBox(page, 'phish report/fwd')
+  }
+  if (printing) {
+    checkSpecificBox(page, 'printers/copiers')
+  }
+  if (reedAccounts) {
+    checkSpecificBox(page, 'reed accounts & access')
+  }
+  if (software) {
+    checkSpecificBox(page, 'software')
+  }
+  if (thesis) {
+    checkSpecificBox(page, 'thesis')
+  }
+  if (twoFactor) {
+    checkSpecificBox(page, 'two-factor')
+  }
+  if (nameChange) {
+    checkSpecificBox(page, 'user/name change')
+  }
+  if (virusMalware) {
+    checkSpecificBox(page, 'virus/malware')
+  }
 
   //presses submit
-  //await page.click("#TicketModify > div.submit > div.buttons > input")
+  await page.click('#TicketModify > div.submit > div.buttons > input')
+  //process.abort() //exit() kills the script too soon, only abort works for some reason!
 }
 
-run()
+;(async () => {
+  const browser = await puppeteer.launch({ headless: true })
+  const [page] = await browser.pages()
+  await page.goto(reedLoginURL + searchURL)
+  await page.type('[name="login"]', login)
+  await page.type('[name="password"]', pw)
+  await page.click(`button[class="btn btn-primary pull-right"]`)
+
+  //wait for page load. (no network requests for 5 seconds, that's super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
+  await page.waitForNetworkIdle({ idleTime: 5000 })
+
+  const tickets = await page.$$eval(`tbody.list-item`, (el) => el.map((x) => x.getAttribute('data-record-id')))
+
+  for (const ticket in tickets) {
+    console.log(tickets[ticket])
+    await run(tickets[ticket])
+  }
+
+  await browser.close()
+})()
