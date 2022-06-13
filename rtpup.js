@@ -50,7 +50,7 @@ var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = 'aigibson';
 var reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&';
 var ticketURL = 'https://help.reed.edu/Ticket/Display.html?id=';
-var currentTicket = 336797; //336797
+var currentTicket = 345842; //336797
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var browser, page;
@@ -96,12 +96,12 @@ function checkSpecificBox(page, checkBoxSelector) {
                 case 0: 
                 //required, otherwise will attempt to click too soon and throw error
                 return [4 /*yield*/, page.waitForSelector("input[value=\"".concat(checkBoxSelector, "\"]"))
-                    // @ts-ignore TODO
+                    // @ts-ignore
                 ];
                 case 1:
                     //required, otherwise will attempt to click too soon and throw error
                     _a.sent();
-                    // @ts-ignore TODO
+                    // @ts-ignore
                     return [4 /*yield*/, page.$eval("input[value=\"".concat(checkBoxSelector, "\"]"), function (check) { return (check.checked = true); })
                         // old inefficient way, leaving so my future self can see
                         //if checkbox is already checked, don't click!
@@ -114,7 +114,7 @@ function checkSpecificBox(page, checkBoxSelector) {
                         //await page.$eval(`input[value="google drive"]`, check => check.checked = true);
                     ];
                 case 2:
-                    // @ts-ignore TODO
+                    // @ts-ignore
                     _a.sent();
                     return [2 /*return*/];
             }
@@ -143,9 +143,9 @@ function ticketFix(page) {
                         //this was from when I didn't realize there could b mult requestors
                         //let titleElement = await page.$(titleSelector);
                         //let titleValue = await page.evaluate(el => el.textContent, titleElement);
-                    ]; //TODO this waits for FIRST selector matching, what if the first loads faster than the second??
+                    ]; //this waits for FIRST selector matching, what if the first loads faster than the second??
                 case 3:
-                    _e.sent(); //TODO this waits for FIRST selector matching, what if the first loads faster than the second??
+                    _e.sent(); //this waits for FIRST selector matching, what if the first loads faster than the second??
                     return [4 /*yield*/, page.$$(titleSelector)];
                 case 4:
                     titleElements = _e.sent();
@@ -348,8 +348,6 @@ function ticketFix(page) {
                 case 59: return [7 /*endfinally*/];
                 case 60:
                     messages = messages.replace(reg.cusAutoReplyRegex, '');
-                    console.log(messages);
-                    //TODO remove ALL instances of CUS autoreply "interested in upgrading to monterey? etc
                     messages += emails + '\n'; //putting the email values in messages to simplify search
                     return [4 /*yield*/, page.waitForSelector('#header > h1')]; //title of ticket
                 case 61:
@@ -530,12 +528,9 @@ function ticketFix(page) {
                     } //end of else regex section
                     currURL = page.url();
                     modifyURL = currURL.replace('Display', 'Modify');
-                    return [4 /*yield*/, page.goto(modifyURL)
-                        //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
-                    ];
+                    return [4 /*yield*/, page.goto(modifyURL)];
                 case 64:
                     _e.sent();
-                    //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
                     console.log('Current Ticket: ' + page.url());
                     return [4 /*yield*/, page.$$("select.select-queue")];
                 case 65:

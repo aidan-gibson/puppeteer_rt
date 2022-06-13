@@ -6,7 +6,7 @@ const pw = readFileSync('./password.txt', 'utf-8')
 const login = 'aigibson'
 const reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&'
 const ticketURL = 'https://help.reed.edu/Ticket/Display.html?id='
-const currentTicket = 336797 //336797
+const currentTicket = 345842 //336797
 
 async function run() {
   const browser = await puppeteer.launch({
@@ -26,7 +26,7 @@ async function run() {
 async function checkSpecificBox(page: Page, checkBoxSelector: string): Promise<void> {
   //required, otherwise will attempt to click too soon and throw error
   await page.waitForSelector(`input[value="${checkBoxSelector}"]`)
-  // @ts-ignore TODO
+  // @ts-ignore
   await page.$eval(`input[value="${checkBoxSelector}"]`, (check) => (check.checked = true))
   // old inefficient way, leaving so my future self can see
   //if checkbox is already checked, don't click!
@@ -47,7 +47,7 @@ async function ticketFix(page: Page): Promise<void> {
 
   //TITLE EMERITUS SECTION
   const titleSelector = `.CustomField__Title_ > span.value` //must check if there are multiple
-  await page.waitForSelector(titleSelector) //TODO this waits for FIRST selector matching, what if the first loads faster than the second??
+  await page.waitForSelector(titleSelector) //this waits for FIRST selector matching, what if the first loads faster than the second??
   //this was from when I didn't realize there could b mult requestors
   //let titleElement = await page.$(titleSelector);
   //let titleValue = await page.evaluate(el => el.textContent, titleElement);
@@ -143,8 +143,6 @@ async function ticketFix(page: Page): Promise<void> {
     messages += emailValue + '\n'
   }
   messages = messages.replace(reg.cusAutoReplyRegex, '')
-  console.log(messages)
-  //TODO remove ALL instances of CUS autoreply "interested in upgrading to monterey? etc
 
   messages += emails + '\n' //putting the email values in messages to simplify search
   await page.waitForSelector('#header > h1') //title of ticket
@@ -309,11 +307,9 @@ async function ticketFix(page: Page): Promise<void> {
   const modifyURL: string = currURL.replace('Display', 'Modify')
   await page.goto(modifyURL)
 
-  //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
-
   console.log('Current Ticket: ' + page.url())
 
-  //checks if in t-watch or cus queue; other queues will probably MOSTLY work but I haven't tested
+  //checks if in t-watch or cus queue; other queues will probably MOSTLY work but I haven't tested so I'm excluding
   const queue = await page.$$(`select.select-queue`)
   const queueValue = await page.evaluate((q) => q.value, queue[1])
   if (queueValue != 4 && queueValue != 11) {
@@ -424,8 +420,6 @@ async function ticketFix(page: Page): Promise<void> {
   }
 
   console.log('End')
-  //console.log(messages)
-  //TODO also the affiliation stuff! check how the prospie logic works again. or maybe dont test it for now tbh, one thing at a time
 
   //
   // if (emeritus){

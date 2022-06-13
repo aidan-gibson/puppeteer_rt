@@ -1,31 +1,26 @@
 ### Assumptions / Decisions
 This will only go as far back at Aug '21 at most (ergo two-factor tags are potentially valid for every ticket etc)
 
-Not using try/catch cuz I want it to fail if it fails; this is not a production constant script it's a one-time thing.
+Not using try/catch cuz I want it to fail if it fails; this is not a production constantly in use script, it's a one-time thing.
 
-False positives > False negatives
+False positives > False negatives (too many tags>none)
 
 Ticket in CUS or T-Watcher Queue
 ### todo
+Only go after tickets with no support tags (implicitly assuming if they have support they have affiliation)
+
+rescope affiliation & prospie logic
+
+
+
+
+remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
+
 maybe tweak applicant/prospie flag logic?
-
-Can cycle thru tickets by just using the ticket number! don't have to click links or anything. best way.
-
-finish up last remaining tags and write the comparison code to see where this program diverges from actually tagged tix. don't actually change any tix; but look at al prev tagged tix
-
-currently finding hard rules and looser regex, currently on software. pull up all tickets in both twatch and cus queue for that tag to understand it, also look at the criteria in the md file from the taylor writeup
-  explicit rules AND regex stuff
-
-when done, run against all currently tagged tickets and look at divergences
 
 Instead of flagging to console.log, simply open in a new window with an alert message w the info??
 
-
-
 If going back thru old tickets, do not modify affiliation!!!!!!!!! only mod old tix affiliation tag if there is no entry.
-
-
-resolve when mult correct
 
 look thru "TODO"s in the code, check ALL comments as well
 
