@@ -46,11 +46,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var reg = require("./regexConstants");
 var puppeteer = require("puppeteer");
 var fs_1 = require("fs");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+var fs = require('fs');
 var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = 'aigibson';
 var reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&';
 //make sure u edit search to show unlimited rows, not just 50
-var searchURL = 'https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=(%20Queue%20%3D%20%27cus%27%20OR%20Queue%20%3D%20%27twatch%27%20)%20AND%20%27CF.%7BSupport%20Tags%7D%27%20IS%20NULL%20AND%20Created%20%3C%20%272022-04-01%27%20AND%20Created%20%3E%20%272022-02-28%27&RowsPerPage=0&SavedChartSearchId=new&SavedSearchId=new';
+var searchURL = 'https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=(%20Queue%20%3D%20%27cus%27%20OR%20Queue%20%3D%20%27twatch%27%20)%20AND%20Created%20%3E%20%272022-04-30%27%20AND%20%27CF.%7BSupport%20Tags%7D%27%20IS%20NULL&RowsPerPage=0&SavedChartSearchId=new&SavedSearchId=new';
 function run(currentTicket) {
     return __awaiter(this, void 0, void 0, function () {
         var ticketURL, browser, page;
@@ -372,6 +374,7 @@ function ticketFix(page, currentTicket) {
                 case 66:
                     ticketTitleValue = _e.sent();
                     messages += ticketTitleValue + '\n';
+                    //console.log(messages)
                     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
                     if (emails.toString().includes('malwarebytes.com')) {
                         virusMalware = true;
@@ -482,7 +485,7 @@ function ticketFix(page, currentTicket) {
                         noTagMatch = reg.noTagRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noNoTagRegexList.some(function (rx) { return rx.test(messages); });
                         //logic of Match bools -> real bools
                         //this may seem redundant to have the "match" set of bools as well, but it gives extra flexibility
-                        if (noTagMatch) {
+                        if (noTagMatch && !massEmailMatch) {
                             noTag = true;
                         }
                         else {
@@ -537,10 +540,18 @@ function ticketFix(page, currentTicket) {
                                 thesis = true;
                                 microsoft = false;
                             } //if thesis, NOT microsoft, always
+                            if (noTag && massEmail) {
+                                massEmail = true;
+                                noTag = false;
+                            }
                         }
                         //if no matches (no regex match AND no hard rule match(implied here)), flag for manual review
                         if (!googleDriveMatch && !googleGroupMatch && !hardwareMatch && !libraryRelatedMatch && !massEmailMatch && !microsoftMatch && !networkMatch && !passwordResetMatch && !phishMatch && !printingMatch && !reedAccountsMatch && !softwareMatch && !thesisMatch && !twoFactorMatch && !nameChangeMatch && !virusMalwareMatch && !noTagMatch && !noTag) {
                             console.log('FLAG NO REGEX MATCH ' + page.url());
+                            fs.appendFile('lucas.txt', page.url() + '\n', function (err) {
+                                if (err)
+                                    throw err;
+                            });
                         }
                     } //end of else regex section
                     currURL = page.url();
@@ -663,37 +674,40 @@ function ticketFix(page, currentTicket) {
                     //   console.log('Algo virusMalware: ' + virusMalware + 'Ticket virusMalware: ' + virusMalwareChecked)
                     // }
                     //console.log('End')
-                    if (emeritus) {
-                        if (faculty) {
-                            checkSpecificBox(page, 'emeritus/emerita');
+                    if (!massEmail) {
+                        //don't set affiliation if mass email
+                        if (emeritus) {
+                            if (faculty) {
+                                checkSpecificBox(page, 'emeritus/emerita');
+                                checkSpecificBox(page, 'faculty');
+                            }
+                            else if (staff) {
+                                checkSpecificBox(page, 'emeritus/emerita');
+                                checkSpecificBox(page, 'staff');
+                            }
+                        }
+                        else if (student) {
+                            checkSpecificBox(page, 'student');
+                            //if(affiliate){checkSpecificBox(page,"affiliate")}
+                        }
+                        else if (alumni) {
+                            checkSpecificBox(page, 'alumni');
+                            //if(faculty){checkSpecificBox(page,"faculty")}
+                            //if(staff){checkSpecificBox(page,"staff")}
+                            //if(affiliate){checkSpecificBox(page,"affiliate")}
+                        }
+                        else if (faculty) {
                             checkSpecificBox(page, 'faculty');
                         }
                         else if (staff) {
-                            checkSpecificBox(page, 'emeritus/emerita');
                             checkSpecificBox(page, 'staff');
                         }
-                    }
-                    else if (student) {
-                        checkSpecificBox(page, 'student');
-                        //if(affiliate){checkSpecificBox(page,"affiliate")}
-                    }
-                    else if (alumni) {
-                        checkSpecificBox(page, 'alumni');
-                        //if(faculty){checkSpecificBox(page,"faculty")}
-                        //if(staff){checkSpecificBox(page,"staff")}
-                        //if(affiliate){checkSpecificBox(page,"affiliate")}
-                    }
-                    else if (faculty) {
-                        checkSpecificBox(page, 'faculty');
-                    }
-                    else if (staff) {
-                        checkSpecificBox(page, 'staff');
-                    }
-                    else if (affiliate) {
-                        checkSpecificBox(page, 'affiliate');
-                    }
-                    else if (nonReedEmail && (ticketTitleValue.includes('applicant') || ticketTitleValue.includes('Applicant'))) {
-                        console.log('FLAG Possible Applicant: ' + modifyURL);
+                        else if (affiliate) {
+                            checkSpecificBox(page, 'affiliate');
+                        }
+                        else if (nonReedEmail && (ticketTitleValue.includes('applicant') || ticketTitleValue.includes('Applicant'))) {
+                            console.log('FLAG Possible Applicant: ' + modifyURL);
+                        }
                     }
                     //SUPPORT TAGS CHECKING BOXES
                     if (googleDrive) {
