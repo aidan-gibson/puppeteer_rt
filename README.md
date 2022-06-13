@@ -4,6 +4,8 @@ This will only go as far back at Aug '21 at most (ergo two-factor tags are poten
 Not using try/catch cuz I want it to fail if it fails; this is not a production constant script it's a one-time thing.
 
 False positives > False negatives
+
+Ticket in CUS or T-Watcher Queue
 ### todo
 maybe tweak applicant/prospie flag logic?
 

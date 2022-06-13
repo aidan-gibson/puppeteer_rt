@@ -44,13 +44,13 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var reg = require("./regexConstants");
+var puppeteer = require("puppeteer");
 var fs_1 = require("fs");
 var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = 'aigibson';
 var reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&';
 var ticketURL = 'https://help.reed.edu/Ticket/Display.html?id=';
-var currentTicket = 336797;
-var puppeteer = require('puppeteer');
+var currentTicket = 210770; //336797
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var browser, page;
@@ -96,12 +96,12 @@ function checkSpecificBox(page, checkBoxSelector) {
                 case 0: 
                 //required, otherwise will attempt to click too soon and throw error
                 return [4 /*yield*/, page.waitForSelector("input[value=\"".concat(checkBoxSelector, "\"]"))
-                    // @ts-ignore
+                    // @ts-ignore TODO
                 ];
                 case 1:
                     //required, otherwise will attempt to click too soon and throw error
                     _a.sent();
-                    // @ts-ignore
+                    // @ts-ignore TODO
                     return [4 /*yield*/, page.$eval("input[value=\"".concat(checkBoxSelector, "\"]"), function (check) { return (check.checked = true); })
                         // old inefficient way, leaving so my future self can see
                         //if checkbox is already checked, don't click!
@@ -114,7 +114,7 @@ function checkSpecificBox(page, checkBoxSelector) {
                         //await page.$eval(`input[value="google drive"]`, check => check.checked = true);
                     ];
                 case 2:
-                    // @ts-ignore
+                    // @ts-ignore TODO
                     _a.sent();
                     return [2 /*return*/];
             }
@@ -124,7 +124,7 @@ function checkSpecificBox(page, checkBoxSelector) {
 function ticketFix(page) {
     var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
     return __awaiter(this, void 0, void 0, function () {
-        var quotedTextSelector, titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, googleDriveCheckbox, googleDriveChecked, googleGroupCheckbox, googleGroupChecked, hardwareCheckbox, hardwareChecked, libraryRelatedCheckbox, libraryRelatedChecked, massEmailCheckbox, massEmailChecked, microsoftCheckbox, microsoftChecked, i, networkCheckbox, networkChecked, passwordResetCheckbox, passwordResetChecked, phishCheckbox, phishChecked, printingCheckbox, printingChecked, reedAccountsCheckbox, reedAccountsChecked, softwareCheckbox, softwareChecked, i, thesisCheckbox, thesisChecked, twoFactorCheckbox, twoFactorChecked, nameChangeCheckbox, nameChangeChecked, virusMalwareCheckbox, virusMalwareChecked;
+        var quotedTextSelector, titleSelector, titleElements, emeritus, titleElements_1, titleElements_1_1, titleElement, titleValue, e_1_1, affiliationSelector, faculty, student, affiliate, alumni, staff, affiliationsElements, affiliationsElements_1, affiliationsElements_1_1, affiliationsElement, affiliationsValue, e_2_1, nonReedEmail, emailSelector, emailElements, emails, emailElements_1, emailElements_1_1, emailElement, emailValue, e_3_1, googleDrive, googleGroup, hardware, libraryRelated, massEmail, microsoft, network, passwordReset, phish, printing, reedAccounts, software, thesis, twoFactor, nameChange, virusMalware, noTag, messages, ticketHistorySelector, emailStanzas, emailStanzas_1, emailStanzas_1_1, emailStanza, emailValue, e_4_1, ticketTitleElement, ticketTitleValue, googleDriveMatch, googleGroupMatch, hardwareMatch, libraryRelatedMatch, massEmailMatch, microsoftMatch, networkMatch, passwordResetMatch, phishMatch, printingMatch, reedAccountsMatch, softwareMatch, thesisMatch, twoFactorMatch, nameChangeMatch, virusMalwareMatch, noTagMatch, currURL, modifyURL, queue, queueValue, googleDriveCheckbox, googleDriveChecked, googleGroupCheckbox, googleGroupChecked, hardwareCheckbox, hardwareChecked, libraryRelatedCheckbox, libraryRelatedChecked, massEmailCheckbox, massEmailChecked, microsoftCheckbox, microsoftChecked, i, networkCheckbox, networkChecked, passwordResetCheckbox, passwordResetChecked, phishCheckbox, phishChecked, printingCheckbox, printingChecked, reedAccountsCheckbox, reedAccountsChecked, softwareCheckbox, softwareChecked, i, thesisCheckbox, thesisChecked, twoFactorCheckbox, twoFactorChecked, nameChangeCheckbox, nameChangeChecked, virusMalwareCheckbox, virusMalwareChecked;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -217,9 +217,6 @@ function ticketFix(page) {
                     }
                     else if (affiliationsValue.includes('alumni') || affiliationsValue.includes('alum')) {
                         alumni = true;
-                    }
-                    else if (affiliationsValue.includes('affiliate')) {
-                        affiliate = true;
                     }
                     else if (affiliationsValue.includes('staff')) {
                         staff = true;
@@ -533,70 +530,78 @@ function ticketFix(page) {
                     currURL = page.url();
                     modifyURL = currURL.replace('Display', 'Modify');
                     return [4 /*yield*/, page.goto(modifyURL)
-                        //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
                         //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
                     ];
                 case 64:
                     _e.sent();
-                    //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
                     //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
                     console.log('Current Ticket: ' + page.url());
-                    return [4 /*yield*/, page.$("input[value=\"google drive\"]")];
+                    return [4 /*yield*/, page.$$("select.select-queue")];
                 case 65:
+                    queue = _e.sent();
+                    return [4 /*yield*/, page.evaluate(function (q) { return q.value; }, queue[1])];
+                case 66:
+                    queueValue = _e.sent();
+                    if (queueValue != 4 && queueValue != 11) {
+                        console.log('Not CUS or TWatch Queue' + ' ' + queueValue);
+                        process.exit(); //ends entire script
+                    }
+                    return [4 /*yield*/, page.$("input[value=\"google drive\"]")];
+                case 67:
                     googleDriveCheckbox = _e.sent();
                     return [4 /*yield*/, googleDriveCheckbox.getProperty('checked')];
-                case 66: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 67:
+                case 68: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 69:
                     googleDriveChecked = _e.sent();
                     if (googleDrive != googleDriveChecked) {
                         console.log('Algo Google Drive: ' + googleDrive + 'Ticket Google Drive: ' + googleDriveChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"google group\"]")];
-                case 68:
+                case 70:
                     googleGroupCheckbox = _e.sent();
                     return [4 /*yield*/, googleGroupCheckbox.getProperty('checked')];
-                case 69: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 70:
+                case 71: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 72:
                     googleGroupChecked = _e.sent();
                     if (googleGroup != googleGroupChecked) {
                         console.log('Algo Google Group: ' + googleGroup + 'Ticket Google Group: ' + googleGroupChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"hardware\"]")];
-                case 71:
+                case 73:
                     hardwareCheckbox = _e.sent();
                     return [4 /*yield*/, hardwareCheckbox.getProperty('checked')];
-                case 72: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 73:
+                case 74: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 75:
                     hardwareChecked = _e.sent();
                     if (hardware != hardwareChecked) {
                         console.log('Algo Hardware: ' + hardware + 'Ticket Hardware: ' + hardwareChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"library related\"]")];
-                case 74:
+                case 76:
                     libraryRelatedCheckbox = _e.sent();
                     return [4 /*yield*/, libraryRelatedCheckbox.getProperty('checked')];
-                case 75: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 76:
+                case 77: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 78:
                     libraryRelatedChecked = _e.sent();
                     if (libraryRelated != libraryRelatedChecked) {
                         console.log('Algo LibraryRelated: ' + libraryRelated + 'Ticket LibraryRelated: ' + libraryRelatedChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"mass email\"]")];
-                case 77:
+                case 79:
                     massEmailCheckbox = _e.sent();
                     return [4 /*yield*/, massEmailCheckbox.getProperty('checked')];
-                case 78: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 79:
+                case 80: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 81:
                     massEmailChecked = _e.sent();
                     if (massEmail != massEmailChecked) {
                         console.log('Algo massEmail: ' + massEmail + 'Ticket massEmail: ' + massEmailChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"microsoft\"]")];
-                case 80:
+                case 82:
                     microsoftCheckbox = _e.sent();
                     return [4 /*yield*/, microsoftCheckbox.getProperty('checked')];
-                case 81: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 82:
+                case 83: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 84:
                     microsoftChecked = _e.sent();
                     if (microsoft != microsoftChecked) {
                         console.log('Algo microsoft: ' + microsoft + 'Ticket microsoft: ' + microsoftChecked);
@@ -605,61 +610,61 @@ function ticketFix(page) {
                         }
                     }
                     return [4 /*yield*/, page.$("input[value=\"network\"]")];
-                case 83:
+                case 85:
                     networkCheckbox = _e.sent();
                     return [4 /*yield*/, networkCheckbox.getProperty('checked')];
-                case 84: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 85:
+                case 86: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 87:
                     networkChecked = _e.sent();
                     if (network != networkChecked) {
                         console.log('Algo network: ' + network + 'Ticket network: ' + networkChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"password reset\"]")];
-                case 86:
+                case 88:
                     passwordResetCheckbox = _e.sent();
                     return [4 /*yield*/, passwordResetCheckbox.getProperty('checked')];
-                case 87: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 88:
+                case 89: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 90:
                     passwordResetChecked = _e.sent();
                     if (passwordReset != passwordResetChecked) {
                         console.log('Algo passwordReset: ' + passwordReset + 'Ticket passwordReset: ' + passwordResetChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"phish report/fwd\"]")];
-                case 89:
+                case 91:
                     phishCheckbox = _e.sent();
                     return [4 /*yield*/, phishCheckbox.getProperty('checked')];
-                case 90: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 91:
+                case 92: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 93:
                     phishChecked = _e.sent();
                     if (phish != phishChecked) {
                         console.log('Algo phish: ' + phish + 'Ticket phish: ' + phishChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"printers/copiers\"]")];
-                case 92:
+                case 94:
                     printingCheckbox = _e.sent();
                     return [4 /*yield*/, printingCheckbox.getProperty('checked')];
-                case 93: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 94:
+                case 95: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 96:
                     printingChecked = _e.sent();
                     if (printing != printingChecked) {
                         console.log('Algo printing: ' + printing + 'Ticket printing: ' + printingChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"reed accounts & access\"]")];
-                case 95:
+                case 97:
                     reedAccountsCheckbox = _e.sent();
                     return [4 /*yield*/, reedAccountsCheckbox.getProperty('checked')];
-                case 96: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 97:
+                case 98: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 99:
                     reedAccountsChecked = _e.sent();
                     if (reedAccounts != reedAccountsChecked) {
                         console.log('Algo reedAccounts: ' + reedAccounts + 'Ticket reedAccounts: ' + reedAccountsChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"software\"]")];
-                case 98:
+                case 100:
                     softwareCheckbox = _e.sent();
                     return [4 /*yield*/, softwareCheckbox.getProperty('checked')];
-                case 99: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 100:
+                case 101: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 102:
                     softwareChecked = _e.sent();
                     if (software != softwareChecked) {
                         console.log('Algo software: ' + software + 'Ticket software: ' + softwareChecked);
@@ -668,41 +673,41 @@ function ticketFix(page) {
                         }
                     }
                     return [4 /*yield*/, page.$("input[value=\"thesis\"]")];
-                case 101:
+                case 103:
                     thesisCheckbox = _e.sent();
                     return [4 /*yield*/, thesisCheckbox.getProperty('checked')];
-                case 102: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 103:
+                case 104: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 105:
                     thesisChecked = _e.sent();
                     if (thesis != thesisChecked) {
                         console.log('Algo thesis: ' + thesis + 'Ticket thesis: ' + thesisChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"two-factor\"]")];
-                case 104:
+                case 106:
                     twoFactorCheckbox = _e.sent();
                     return [4 /*yield*/, twoFactorCheckbox.getProperty('checked')];
-                case 105: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 106:
+                case 107: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 108:
                     twoFactorChecked = _e.sent();
                     if (twoFactor != twoFactorChecked) {
                         console.log('Algo twoFactor: ' + twoFactor + 'Ticket twoFactor: ' + twoFactorChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"user/name change\"]")];
-                case 107:
+                case 109:
                     nameChangeCheckbox = _e.sent();
                     return [4 /*yield*/, nameChangeCheckbox.getProperty('checked')];
-                case 108: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 109:
+                case 110: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 111:
                     nameChangeChecked = _e.sent();
                     if (nameChange != nameChangeChecked) {
                         console.log('Algo nameChange: ' + nameChange + 'Ticket nameChange: ' + nameChangeChecked);
                     }
                     return [4 /*yield*/, page.$("input[value=\"virus/malware\"]")];
-                case 110:
+                case 112:
                     virusMalwareCheckbox = _e.sent();
                     return [4 /*yield*/, virusMalwareCheckbox.getProperty('checked')];
-                case 111: return [4 /*yield*/, (_e.sent()).jsonValue()];
-                case 112:
+                case 113: return [4 /*yield*/, (_e.sent()).jsonValue()];
+                case 114:
                     virusMalwareChecked = _e.sent();
                     if (virusMalware != virusMalwareChecked) {
                         console.log('Algo virusMalware: ' + virusMalware + 'Ticket virusMalware: ' + virusMalwareChecked);

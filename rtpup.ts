@@ -1,12 +1,12 @@
 import * as reg from './regexConstants'
+import puppeteer = require('puppeteer')
 import { Page } from 'puppeteer'
 import { readFileSync } from 'fs'
 const pw = readFileSync('./password.txt', 'utf-8')
 const login = 'aigibson'
 const reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&'
 const ticketURL = 'https://help.reed.edu/Ticket/Display.html?id='
-const currentTicket = 336797
-const puppeteer = require('puppeteer')
+const currentTicket = 210770 //336797
 
 async function run() {
   const browser = await puppeteer.launch({
@@ -26,7 +26,7 @@ async function run() {
 async function checkSpecificBox(page: Page, checkBoxSelector: string): Promise<void> {
   //required, otherwise will attempt to click too soon and throw error
   await page.waitForSelector(`input[value="${checkBoxSelector}"]`)
-  // @ts-ignore
+  // @ts-ignore TODO
   await page.$eval(`input[value="${checkBoxSelector}"]`, (check) => (check.checked = true))
   // old inefficient way, leaving so my future self can see
   //if checkbox is already checked, don't click!
@@ -86,8 +86,6 @@ async function ticketFix(page: Page): Promise<void> {
       affiliate = true
     } else if (affiliationsValue.includes('alumni') || affiliationsValue.includes('alum')) {
       alumni = true
-    } else if (affiliationsValue.includes('affiliate')) {
-      affiliate = true
     } else if (affiliationsValue.includes('staff')) {
       staff = true
     }
@@ -307,11 +305,17 @@ async function ticketFix(page: Page): Promise<void> {
   const modifyURL: string = currURL.replace('Display', 'Modify')
   await page.goto(modifyURL)
 
-  //COMPARE ALREADY TAGGED TIX TO SCRIPT DECISION SECTION
-
   //TODO remember (for older tickets especially) the requester affiliation may have literally changed, like when ticket was made they were faculty and it was tagged as such but now they are not etc
 
   console.log('Current Ticket: ' + page.url())
+
+  //checks if in t-watch or cus queue; other queues will probably MOSTLY work but I haven't tested
+  const queue = await page.$$(`select.select-queue`)
+  const queueValue = await page.evaluate((q) => q.value, queue[1])
+  if (queueValue != 4 && queueValue != 11) {
+    console.log('Not CUS or TWatch Queue' + ' ' + queueValue)
+    process.exit() //ends entire script
+  }
 
   const googleDriveCheckbox = await page.$(`input[value="google drive"]`)
   const googleDriveChecked = await (await googleDriveCheckbox.getProperty('checked')).jsonValue()
