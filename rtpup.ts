@@ -6,7 +6,7 @@ const pw = readFileSync('./password.txt', 'utf-8')
 const login = 'aigibson'
 const reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&'
 const ticketURL = 'https://help.reed.edu/Ticket/Display.html?id='
-const currentTicket = 210770 //336797
+const currentTicket = 336797 //336797
 
 async function run() {
   const browser = await puppeteer.launch({
@@ -140,17 +140,21 @@ async function ticketFix(page: Page): Promise<void> {
   const emailStanzas = await page.$$(ticketHistorySelector)
   for await (const emailStanza of emailStanzas) {
     const emailValue = await page.evaluate((el) => el.innerText, emailStanza) //this gives proper spacing after changing textContent to innerText
-    if (!emailValue.includes()) messages += emailValue + '\n'
+    messages += emailValue + '\n'
   }
+  messages = messages.replace(reg.cusAutoReplyRegex, '')
+  console.log(messages)
+  //TODO remove ALL instances of CUS autoreply "interested in upgrading to monterey? etc
+
   messages += emails + '\n' //putting the email values in messages to simplify search
   await page.waitForSelector('#header > h1') //title of ticket
   const ticketTitleElement = await page.$('#header > h1')
   const ticketTitleValue = await page.evaluate((el) => el.textContent, ticketTitleElement)
+
   messages += ticketTitleValue + '\n'
 
   //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
 
-  //console.log(messages)
   if (emails.toString().includes('malwarebytes.com')) {
     virusMalware = true
   } else if (emails.toString().includes('crowdstrike')) {

@@ -50,7 +50,7 @@ var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = 'aigibson';
 var reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&';
 var ticketURL = 'https://help.reed.edu/Ticket/Display.html?id=';
-var currentTicket = 210770; //336797
+var currentTicket = 336797; //336797
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var browser, page;
@@ -326,8 +326,7 @@ function ticketFix(page) {
                 case 51:
                     emailValue = _e.sent() //this gives proper spacing after changing textContent to innerText
                     ;
-                    if (!emailValue.includes())
-                        messages += emailValue + '\n';
+                    messages += emailValue + '\n';
                     _e.label = 52;
                 case 52: return [3 /*break*/, 49];
                 case 53: return [3 /*break*/, 60];
@@ -348,6 +347,9 @@ function ticketFix(page) {
                     return [7 /*endfinally*/];
                 case 59: return [7 /*endfinally*/];
                 case 60:
+                    messages = messages.replace(reg.cusAutoReplyRegex, '');
+                    console.log(messages);
+                    //TODO remove ALL instances of CUS autoreply "interested in upgrading to monterey? etc
                     messages += emails + '\n'; //putting the email values in messages to simplify search
                     return [4 /*yield*/, page.waitForSelector('#header > h1')]; //title of ticket
                 case 61:
@@ -360,7 +362,6 @@ function ticketFix(page) {
                     ticketTitleValue = _e.sent();
                     messages += ticketTitleValue + '\n';
                     //HARD RULES SECTION (obvious/easy support tag selection). true no matter WHAT. nothing fuzzy/ambiguous.
-                    //console.log(messages)
                     if (emails.toString().includes('malwarebytes.com')) {
                         virusMalware = true;
                     }

@@ -1,4 +1,6 @@
 // /i means case-insensitive, \b are word borders
+export const cusAutoReplyRegex = /This inbox is monitored 8:30am - 5pm, Monday through Friday.(.*)AMAZON ECHO, ETC.\)\*\*(.*?)phone: 503-777-7525/s
+
 export const googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i]
 export const noGoogleDriveRegexList = []
 export const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i]
