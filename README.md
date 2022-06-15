@@ -1,3 +1,5 @@
+For large amnts of tickets I get a connection timeout after a while.
+
 ### Assumptions / Decisions
 This will only go as far back at Aug '21 at most (ergo two-factor tags are potentially valid for every ticket etc)
 

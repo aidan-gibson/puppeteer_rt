@@ -1,11 +1,11 @@
 // /i means case-insensitive, \b are word borders
 export const cusAutoReplyRegex = /This inbox is monitored 8:30am - 5pm, Monday through Friday.(.*)AMAZON ECHO, ETC.\)\*\*(.*?)phone: 503-777-7525/s
 
-export const googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i]
+export const googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i, /shared drive/i]
 export const noGoogleDriveRegexList = []
 export const googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i, /external users to that group/i]
 export const noGoogleGroupRegexList = []
-export const hardwareRegexList = [/iMac/, /hardware store/i, /hardware shop/i, /macbook pro replacement/i]
+export const hardwareRegexList = [/iMac/, /hardware store/i, /hardware shop/i, /macbook pro replacement/i, /System Model:/, /System Name:/, /System Manufacturer:/, /CUS Computer Maintenance Required/i, /tracking down/i, /buy-back/i, /reed equipment/i, /adapter/i, /usb-c/i, /usbc/i, /HDMI/i, /thunderbolt/i, /vga/i, /\bdvi\b/i, /won't turn on/i, /asset number/i, /monitor/i, /camera/i, /microphone/i]
 export const noHardwareRegexList = []
 export const libraryRelatedRegexList = [/e-book/i, /library/i, /librarian/i, /IMC/, /LangLab/i]
 export const noLibraryRelatedRegexList = []
@@ -20,10 +20,10 @@ export const noPasswordResetRegexList = []
 export const phishRegexList = [/phish/i, /scam/i, /spam/i]
 export const noPhishRegexList = [/Security Updates for Reed Computers/]
 export const printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i]
-export const noPrintingRegexList = []
+export const noPrintingRegexList = [/print barcode/i, /small print/i]
 export const reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/, /auth group/i, /access IRIS/, /computing account/i, /email-alias-request@reed.edu/, /blackboard/i]
 export const noReedAccountsRegexList = []
-export const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i, /software update/i, /software upgrade/i, /uninstall/i, /matlab/i, /force quit/i, /splashtop/i] //removed /\bdriver\b/i
+export const softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i, /software update/i, /software upgrade/i, /uninstall/i, /matlab/i, /force quit/i, /splashtop/i, /license/i] //removed /\bdriver\b/i
 export const noSoftwareRegexList = []
 export const thesisRegexList = [/thesis/i] //[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
 export const noThesisRegexList = [/vpn/i]

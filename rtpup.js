@@ -52,7 +52,7 @@ var pw = (0, fs_1.readFileSync)('./password.txt', 'utf-8');
 var login = 'aigibson';
 var reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&';
 //make sure u edit search to show unlimited rows, not just 50
-var searchURL = 'https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=(%20Queue%20%3D%20%27cus%27%20OR%20Queue%20%3D%20%27twatch%27%20)%20AND%20Created%20%3E%20%272022-04-30%27%20AND%20%27CF.%7BSupport%20Tags%7D%27%20IS%20NULL&RowsPerPage=0&SavedChartSearchId=new&SavedSearchId=new';
+var searchURL = 'https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=(%20Queue%20%3D%20%27cus%27%20OR%20Queue%20%3D%20%27twatch%27%20)%20AND%20Created%20%3C%20%272022-01-01%27%20AND%20Created%20%3E%20%272021-07-31%27%20AND%20%27CF.%7BSupport%20Tags%7D%27%20IS%20NULL%20AND%20id%20%3E%20332850&RowsPerPage=0&SavedChartSearchId=new&SavedSearchId=new';
 function run(currentTicket) {
     return __awaiter(this, void 0, void 0, function () {
         var ticketURL, browser, page;
@@ -465,6 +465,12 @@ function ticketFix(page, currentTicket) {
                     else if (emails.toString().includes('email-alias-request@reed.edu')) {
                         reedAccounts = true;
                     }
+                    else if (ticketTitleValue.includes('CUS Computer Maintenance Required') || ticketTitleValue.includes('Tracking Down') || ticketTitleValue.includes('tracking down')) {
+                        hardware = true;
+                    }
+                    else if (messages.includes('Code42')) {
+                        software = true;
+                    }
                     else {
                         googleDriveMatch = reg.googleDriveRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noGoogleDriveRegexList.some(function (rx) { return rx.test(messages); });
                         googleGroupMatch = reg.googleGroupRegexList.some(function (rx) { return rx.test(messages); }) && !reg.noGoogleGroupRegexList.some(function (rx) { return rx.test(messages); });
@@ -791,18 +797,19 @@ function ticketFix(page, currentTicket) {
             case 5:
                 _c.sent();
                 return [4 /*yield*/, page.click("button[class=\"btn btn-primary pull-right\"]")
-                    //wait for page load. (no network requests for 5 seconds, that's super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
+                    //wait for page load. (no network requests for idleTime ms, trying to b super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
                 ];
             case 6:
                 _c.sent();
-                //wait for page load. (no network requests for 5 seconds, that's super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
-                return [4 /*yield*/, page.waitForNetworkIdle({ idleTime: 5000 })];
+                //wait for page load. (no network requests for idleTime ms, trying to b super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
+                return [4 /*yield*/, page.waitForNetworkIdle({ idleTime: 10000 })];
             case 7:
-                //wait for page load. (no network requests for 5 seconds, that's super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
+                //wait for page load. (no network requests for idleTime ms, trying to b super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
                 _c.sent();
                 return [4 /*yield*/, page.$$eval("tbody.list-item", function (el) { return el.map(function (x) { return x.getAttribute('data-record-id'); }); })];
             case 8:
                 tickets = _c.sent();
+                console.log(tickets.length);
                 _a = [];
                 for (_b in tickets)
                     _a.push(_b);

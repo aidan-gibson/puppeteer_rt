@@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.noNoTagRegexList = exports.noTagRegexList = exports.noVirusMalwareRegexList = exports.virusMalwareRegexList = exports.noNameChangeRegexList = exports.nameChangeRegexList = exports.noTwoFactorRegexList = exports.twoFactorRegexList = exports.noThesisRegexList = exports.thesisRegexList = exports.noSoftwareRegexList = exports.softwareRegexList = exports.noReedAccountsRegexList = exports.reedAccountsRegexList = exports.noPrintingRegexList = exports.printingRegexList = exports.noPhishRegexList = exports.phishRegexList = exports.noPasswordResetRegexList = exports.passwordResetRegexList = exports.noNetworkRegexList = exports.networkRegexList = exports.noMicrosoftRegexList = exports.microsoftRegexList = exports.noMassEmailRegexList = exports.massEmailRegexList = exports.noLibraryRelatedRegexList = exports.libraryRelatedRegexList = exports.noHardwareRegexList = exports.hardwareRegexList = exports.noGoogleGroupRegexList = exports.googleGroupRegexList = exports.noGoogleDriveRegexList = exports.googleDriveRegexList = exports.cusAutoReplyRegex = void 0;
 // /i means case-insensitive, \b are word borders
 exports.cusAutoReplyRegex = /This inbox is monitored 8:30am - 5pm, Monday through Friday.(.*)AMAZON ECHO, ETC.\)\*\*(.*?)phone: 503-777-7525/s;
-exports.googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i];
+exports.googleDriveRegexList = [/google drive/i, /drive request/i, /google form/i, /shared drive/i];
 exports.noGoogleDriveRegexList = [];
 exports.googleGroupRegexList = [/google group/i, /@groups.google/, /group request/i, /external users to that group/i];
 exports.noGoogleGroupRegexList = [];
-exports.hardwareRegexList = [/iMac/, /hardware store/i, /hardware shop/i, /macbook pro replacement/i];
+exports.hardwareRegexList = [/iMac/, /hardware store/i, /hardware shop/i, /macbook pro replacement/i, /System Model:/, /System Name:/, /System Manufacturer:/, /CUS Computer Maintenance Required/i, /tracking down/i, /buy-back/i, /reed equipment/i, /adapter/i, /usb-c/i, /usbc/i, /HDMI/i, /thunderbolt/i, /vga/i, /\bdvi\b/i, /won't turn on/i, /asset number/i, /monitor/i, /camera/i, /microphone/i];
 exports.noHardwareRegexList = [];
 exports.libraryRelatedRegexList = [/e-book/i, /library/i, /librarian/i, /IMC/, /LangLab/i];
 exports.noLibraryRelatedRegexList = [];
@@ -22,10 +22,10 @@ exports.noPasswordResetRegexList = [];
 exports.phishRegexList = [/phish/i, /scam/i, /spam/i];
 exports.noPhishRegexList = [/Security Updates for Reed Computers/];
 exports.printingRegexList = [/print/i, /ipp.reed.edu/, /xerox/i, /ctx/i, /laserjet/i, /toner/i];
-exports.noPrintingRegexList = [];
+exports.noPrintingRegexList = [/print barcode/i, /small print/i];
 exports.reedAccountsRegexList = [/new employee/i, /kerberos/i, /vpn/i, /dlist/i, /delegate/i, /setup your Reed account/i, /claim your Reed account/i, /account creation/i, /listserv/i, /accounts are scheduled to be closed/i, /reed computing accounts/i, /account tool/i, /online_forms\/protected\/computing.php/, /account_closing/, /auth group/i, /access IRIS/, /computing account/i, /email-alias-request@reed.edu/, /blackboard/i];
 exports.noReedAccountsRegexList = [];
-exports.softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i, /software update/i, /software upgrade/i, /uninstall/i, /matlab/i, /force quit/i, /splashtop/i]; //removed /\bdriver\b/i
+exports.softwareRegexList = [/1password/i, /one-password/i, /onepassword/i, /OS update/i, /OS upgrade/i, /kernel/i, /adobe/i, /acrobat/i, /photoshop/i, /creative cloud/i, /premiere pro/i, /lightroom/i, /indesign/i, /CS6/, /dreamweaver/i, /premiere rush/i, /code42/i, /crash/i, /Upgrade NOT Recommended/, /Monterey/i, /RStudio/i, /mathematica/i, /wolfram/i, /medicat/i, /big sur/i, /catalina/i, /mojave/i, /high sierra/i, /operating system/i, /\bvlc\b/i, /quicktime/i, /zotero/i, /latex/i, /stata/i, /filemaker/i, /vmware/i, /software update/i, /software upgrade/i, /uninstall/i, /matlab/i, /force quit/i, /splashtop/i, /license/i]; //removed /\bdriver\b/i
 exports.noSoftwareRegexList = [];
 exports.thesisRegexList = [/thesis/i]; //[/thesis format/i, /thesis template/i, /thesis word template/i, /r template/i]
 exports.noThesisRegexList = [/vpn/i];

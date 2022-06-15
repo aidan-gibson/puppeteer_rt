@@ -8,7 +8,8 @@ const pw = readFileSync('./password.txt', 'utf-8')
 const login = 'aigibson'
 const reedLoginURL = 'https://weblogin.reed.edu/?cosign-help&'
 //make sure u edit search to show unlimited rows, not just 50
-const searchURL = 'https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=(%20Queue%20%3D%20%27cus%27%20OR%20Queue%20%3D%20%27twatch%27%20)%20AND%20Created%20%3E%20%272022-04-30%27%20AND%20%27CF.%7BSupport%20Tags%7D%27%20IS%20NULL&RowsPerPage=0&SavedChartSearchId=new&SavedSearchId=new'
+const searchURL =
+  'https://help.reed.edu/Search/Results.html?Format=%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__id__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3A%23%27%2C%0A%27%3Cb%3E%3Ca%20href%3D%22__WebPath__%2FTicket%2FDisplay.html%3Fid%3D__id__%22%3E__Subject__%3C%2Fa%3E%3C%2Fb%3E%2FTITLE%3ASubject%27%2C%0AStatus%2C%0AQueueName%2C%0AOwner%2C%0APriority%2C%0A%27__NEWLINE__%27%2C%0A%27__NBSP__%27%2C%0A%27%3Csmall%3E__Requestors__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__CreatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__ToldRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__LastUpdatedRelative__%3C%2Fsmall%3E%27%2C%0A%27%3Csmall%3E__TimeLeft__%3C%2Fsmall%3E%27&Order=ASC%7CASC%7CASC%7CASC&OrderBy=id%7C%7C%7C&Query=(%20Queue%20%3D%20%27cus%27%20OR%20Queue%20%3D%20%27twatch%27%20)%20AND%20Created%20%3C%20%272022-01-01%27%20AND%20Created%20%3E%20%272021-07-31%27%20AND%20%27CF.%7BSupport%20Tags%7D%27%20IS%20NULL%20AND%20id%20%3E%20332850&RowsPerPage=0&SavedChartSearchId=new&SavedSearchId=new'
 
 async function run(currentTicket) {
   const ticketURL = 'https://help.reed.edu/Ticket/Display.html?id='
@@ -222,6 +223,10 @@ async function ticketFix(page: Page, currentTicket): Promise<void> {
     googleGroup = true
   } else if (emails.toString().includes('email-alias-request@reed.edu')) {
     reedAccounts = true
+  } else if (ticketTitleValue.includes('CUS Computer Maintenance Required') || ticketTitleValue.includes('Tracking Down') || ticketTitleValue.includes('tracking down')) {
+    hardware = true
+  } else if (messages.includes('Code42')) {
+    software = true
   } else {
     //regex section, only run if no hard rules found (moved regex lists outside of fnc to b global
 
@@ -524,11 +529,11 @@ async function ticketFix(page: Page, currentTicket): Promise<void> {
   await page.type('[name="password"]', pw)
   await page.click(`button[class="btn btn-primary pull-right"]`)
 
-  //wait for page load. (no network requests for 5 seconds, that's super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
-  await page.waitForNetworkIdle({ idleTime: 5000 })
+  //wait for page load. (no network requests for idleTime ms, trying to b super generous & borderline inefficient but whatever, this could b used on lots of tickets&a shitty connection
+  await page.waitForNetworkIdle({ idleTime: 10000 })
 
   const tickets = await page.$$eval(`tbody.list-item`, (el) => el.map((x) => x.getAttribute('data-record-id')))
-
+  console.log(tickets.length)
   for (const ticket in tickets) {
     console.log(tickets[ticket])
     await run(tickets[ticket])
